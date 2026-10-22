@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taza Bishkek — карта проблемных точек</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<header><h1>Taza Bishkek</h1>
+<nav><button data-v="map" class="on">Карта</button><button data-v="mod">Модератор</button></nav></header>
+<main>
+<div id="map"></div>
+<aside>
+ <section id="v-map">
+  <h2>Сообщить о точке</h2>
+  <div id="legend"></div>
+  <p class="hint">Нажмите на карте место или <button id="geo" type="button">моё местоположение</button></p>
+  <form id="form">
+   <select name="type" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select>
+   <textarea name="desc" placeholder="Описание (без имён и телефонов)"></textarea>
+   <input type="file" name="photo" accept="image/*">
+   <div id="dup" class="warn" hidden></div>
+   <button>Отправить заявку</button>
+  </form>
+  <p id="msg"></p>
+ </section>
+ <section id="v-mod" hidden>
+  <p id="modHelp" class="hint"></p><div id="login"><input id="email" type="email" autocomplete="username" placeholder="Email модератора"><input id="pw" type="password" autocomplete="current-password" placeholder="Пароль"><button id="loginBtn">Войти</button></div><button id="logoutBtn" hidden>Выйти</button>
+  <div id="list" hidden></div>
+ </section>
+</aside>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body></html>
