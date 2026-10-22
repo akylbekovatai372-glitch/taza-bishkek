@@ -74,7 +74,7 @@ function checkDup() {
 async function load() {
   reports = await store.list();
   layer.clearLayers();
-  reports.forEach(r => L.marker([r.lat, r.lng], { icon: dot(COL[ST.indexOf(r.status)]) }).addTo(layer).bindPopup(
+  reports.filter(r => r.status !== "Убрано").forEach(r => L.marker([r.lat, r.lng], { icon: dot(COL[ST.indexOf(r.status)]) }).addTo(layer).bindPopup(
     `<b>${code(r.id)}</b> · ${esc(r.status)}<br>${esc(r.type)}<br>${esc(r.description || "")}` +
     `<div class="ba">${r.photo ? `<figure>До<img src="${esc(r.photo)}"></figure>` : ""}${r.photo_after ? `<figure>После<img src="${esc(r.photo_after)}"></figure>` : ""}</div>`));
   renderList();
