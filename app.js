@@ -65,12 +65,38 @@ const layer = L.layerGroup().addTo(map);
 const dot = c => L.divIcon({ className: "", html: `<span class="pin" style="background:${c}"></span>`, iconSize: [18, 18] });
 let pick = null, pickMarker = null, reports = [];
 
+
 function setPick(ll) {
+  if (!BISHKEK_VIEW_BOUNDS.contains(ll)) {
+    alert("Пока заявки принимаются только в Бишкеке.");
+    return;
+  }
+
   pick = ll;
-  if (pickMarker) pickMarker.setLatLng(ll);
-  else pickMarker = L.marker(ll, { draggable: true }).addTo(map).on("dragend", e => { pick = e.target.getLatLng(); checkDup(); });
+
+  if (pickMarker) {
+    pickMarker.setLatLng(ll);
+  } else {
+    pickMarker = L.marker(ll, {
+      draggable: true
+    }).addTo(map);
+
+    pickMarker.on("dragend", e => {
+      const newPoint = e.target.getLatLng();
+
+      if (!BISHKEK_VIEW_BOUNDS.contains(newPoint)) {
+        e.target.setLatLng(pick);
+        alert("Точка находится вне разрешённой области.");
+        return;
+      }
+
+      setPick(newPoint);
+    });
+  }
+
   checkDup();
 }
+
 map.on("click", e => setPick(e.latlng));
 $("#geo").onclick = () => navigator.geolocation.getCurrentPosition(p => {
   const ll = L.latLng(p.coords.latitude, p.coords.longitude); map.setView(ll, 16); setPick(ll);
