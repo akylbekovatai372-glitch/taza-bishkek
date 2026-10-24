@@ -47,7 +47,19 @@ const store = sb ? {
 };
 
 // ---- Карта ----
-const map = L.map("map").setView([42.8746, 74.5698], 12);
+
+const BISHKEK_VIEW_BOUNDS = L.latLngBounds(
+  [42.76, 74.40],
+  [42.98, 74.80]
+);
+
+const map = L.map("map", {
+  maxBounds: BISHKEK_VIEW_BOUNDS,
+  maxBoundsViscosity: 1.0,
+  minZoom: 11,
+  maxZoom: 19
+}).setView([42.8746, 74.5698], 12);
+
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(map);
 const layer = L.layerGroup().addTo(map);
 const dot = c => L.divIcon({ className: "", html: `<span class="pin" style="background:${c}"></span>`, iconSize: [18, 18] });
