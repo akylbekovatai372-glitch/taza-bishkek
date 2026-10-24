@@ -7,6 +7,20 @@ const esc = s => String(s).replace(/[&<>"']/g, c => "&#" + c.charCodeAt(0) + ";"
 const sb = C.SUPABASE_URL && C.SUPABASE_KEY ? supabase.createClient(C.SUPABASE_URL, C.SUPABASE_KEY) : null;
 let isModerator = false;
 
+async function ensureAnonymousUser() {
+  if (!sb) return;
+
+  const { data: { session }, error } =
+    await sb.auth.getSession();
+
+  if (error) throw error;
+  if (session) return;
+
+  const result = await sb.auth.signInAnonymously();
+
+  if (result.error) throw result.error;
+}
+
 // ---- Хранилище: Supabase или localStorage (демо) ----
 const store = sb ? {
 
@@ -203,7 +217,7 @@ if (sb) sb.auth.onAuthStateChange(() => {
   // Не вызываем методы Supabase синхронно из auth callback.
   setTimeout(() => syncModerator().catch(console.error), 0);
 });
-syncModerator().catch(console.error);
+
 
 // ---- Вкладки и легенда ----
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
@@ -211,4 +225,17 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   $("#v-map").hidden = b.dataset.v !== "map"; $("#v-mod").hidden = b.dataset.v !== "mod";
 });
 $("#legend").innerHTML = ST.map((s, i) => `<span><i class="pin" style="background:${COL[i]}"></i>${s}</span>`).join("");
-load();
+
+async function startApp() {
+  try {
+    await ensureAnonymousUser();
+    await syncModerator();
+    await load();
+  } catch (err) {
+    console.error("Ошибка запуска:", err);
+    alert("Не удалось загрузить сайт. Попробуйте обновить страницу.");
+  }
+}
+
+startApp();
+
