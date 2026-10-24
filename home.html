@@ -17,7 +17,17 @@
       🌿 Taza Bishkek
     </a>
 
-    <nav class="nav">
+    
+<button
+  class="menu-toggle"
+  type="button"
+  aria-label="Открыть меню"
+  aria-controls="mobile-navigation"
+  aria-expanded="false"
+>
+  ☰
+</button>
+<nav class="nav" id="mobile-navigation">
       <a href="home.html">Главная</a>
       <a href="index.html">Отправить заявку</a>
       <a href="#help">Помощь</a>
@@ -119,5 +129,31 @@
     <p>WhatsApp и Telegram — скоро</p>
   </footer>
 
+
+<script>
+  const menuButton = document.querySelector(".menu-toggle");
+  const navigation = document.querySelector(".nav");
+
+  menuButton.addEventListener("click", () => {
+    const isOpen = navigation.classList.toggle("open");
+
+    menuButton.setAttribute("aria-expanded", String(isOpen));
+    menuButton.setAttribute(
+      "aria-label",
+      isOpen ? "Закрыть меню" : "Открыть меню"
+    );
+
+    menuButton.textContent = isOpen ? "✕" : "☰";
+  });
+
+  navigation.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      navigation.classList.remove("open");
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Открыть меню");
+      menuButton.textContent = "☰";
+    });
+  });
+</script>
 </body>
 </html>
