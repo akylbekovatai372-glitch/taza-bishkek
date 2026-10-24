@@ -233,3 +233,51 @@ body {
     text-align: center;
   }
 }
+
+/* ===== MOBILE NAVIGATION ===== */
+
+/* На компьютерах кнопку меню скрываем */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .menu-toggle {
+    display: block;
+    margin-left: auto;
+    padding: 9px 14px;
+    background: #e7f7ec;
+    color: #168653;
+    border: 0;
+    border-radius: 10px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0;
+    order: 3;
+  }
+
+  .nav.open {
+    display: flex;
+  }
+
+  .nav a {
+    display: block;
+    padding: 14px 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .header-actions {
+    order: 4;
+  }
+}
