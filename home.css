@@ -343,3 +343,60 @@ body {
     font-size: 34px;
   }
 }
+
+/* ===== REPORT STATUS SEARCH ===== */
+
+.status-form {
+  max-width: 650px;
+  margin-top: 24px;
+}
+
+.status-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.status-search {
+  display: flex;
+  gap: 12px;
+}
+
+.status-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font: inherit;
+}
+
+.status-search button {
+  padding: 15px 22px;
+  background: #168653;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status-search button:hover {
+  background: #125c3c;
+}
+
+#statusResult {
+  max-width: 650px;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .status-search {
+    flex-direction: column;
+  }
+
+  .status-search button {
+    width: 100%;
+  }
+}
