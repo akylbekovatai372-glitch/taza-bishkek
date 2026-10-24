@@ -134,13 +134,37 @@
 
 
     <!-- ПРОВЕРКА СТАТУСА -->
-    <section id="status" class="section">
-      <h2>Проверить статус заявки</h2>
-      <p>
-        Здесь можно будет найти заявку
-        по её номеру.
-      </p>
-    </section>
+   
+<section id="status" class="section">
+  <h2>Проверить статус заявки</h2>
+
+  <p>
+    Введите номер заявки, чтобы узнать,
+    на каком этапе находится обращение.
+  </p>
+
+  <form id="statusForm" class="status-form">
+    <label for="reportCode">Номер заявки</label>
+
+    <div class="status-search">
+      <input
+        id="reportCode"
+        type="text"
+        placeholder="Например, TB-012"
+        maxlength="20"
+        required
+      >
+
+      <button type="submit">
+        Найти заявку
+      </button>
+    </div>
+  </form>
+
+  <div id="statusResult"
+       role="status"
+       aria-live="polite"></div>
+</section>
 
     <!-- АККАУНТ -->
     <section id="account" class="section">
