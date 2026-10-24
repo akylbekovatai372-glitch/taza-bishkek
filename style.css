@@ -17,3 +17,88 @@ form button,#loginBtn{background:#2f9e44;color:#fff;border:0;cursor:pointer}
 
 #login{display:grid;gap:8px}#loginBtn:disabled{opacity:.6;cursor:wait}#logoutBtn{padding:8px 14px;border:0;background:#e9ecef;border-radius:6px;cursor:pointer;margin-bottom:10px}
 [hidden]{display:none !important}
+
+/* ===== TAZA BISHKEK 2.0 — HEADER ===== */
+
+header {
+  background: #ffffff;
+  color: #182b27;
+  padding: 16px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  background: #e8f7ee;
+  border-radius: 14px;
+  font-size: 26px;
+}
+
+.brand h1 {
+  font-size: 23px;
+  font-weight: 800;
+  color: #168653;
+  margin: 0;
+}
+
+.brand-subtitle {
+  margin: 3px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.main-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.main-nav button {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid transparent;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.2s;
+}
+
+.main-nav button:hover {
+  background: #e2e8f0;
+}
+
+.main-nav button.on {
+  background: #168653;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 14px;
+  }
+
+  .main-nav {
+    width: 100%;
+  }
+
+  .main-nav button {
+    flex: 1;
+    padding: 10px;
+    font-size: 13px;
+  }
+}
