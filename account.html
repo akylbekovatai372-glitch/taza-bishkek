@@ -25,7 +25,59 @@
         отслеживать свои заявки и участвовать
         в улучшении нашего города.
       </p>
-    </section>
+    </section> 
+<div class="auth-container">
+
+  <div class="auth-tabs">
+    <button type="button" id="loginTab" class="active">
+      Войти
+    </button>
+    <button type="button" id="registerTab">
+      Регистрация
+    </button>
+  </div>
+
+  <form id="authForm">
+
+    <div id="nameField" hidden>
+      <label for="userName">Ваше имя</label>
+      <input
+        type="text"
+        id="userName"
+        placeholder="Введите имя"
+        autocomplete="name"
+      >
+    </div>
+
+    <label for="userEmail">Электронная почта</label>
+    <input
+      type="email"
+      id="userEmail"
+      placeholder="example@gmail.com"
+      autocomplete="email"
+      required
+    >
+
+    <label for="userPassword">Пароль</label>
+    <input
+      type="password"
+      id="userPassword"
+      placeholder="Введите пароль"
+      autocomplete="current-password"
+      minlength="8"
+      required
+    >
+
+    <button type="submit" id="authSubmit">
+      Войти
+    </button>
+
+    <p id="authMessage" role="status"></p>
+
+  </form>
+
+</div>
+
   </main>
 
 </body>
