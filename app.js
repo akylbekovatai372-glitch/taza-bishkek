@@ -9,7 +9,17 @@ let isModerator = false;
 
 // ---- Хранилище: Supabase или localStorage (демо) ----
 const store = sb ? {
-  async list() { const { data, error } = await sb.from("reports").select("*").order("id"); if (error) throw error; return data; },
+
+async list() {
+  const { data, error } = await sb
+    .from("reports")
+    .select("id,type,description,lat,lng,status,photo,photo_after,created_at")
+    .order("id");
+
+  if (error) throw error;
+  return data;
+},
+
   async add(r, file) {
     if (file) {
       const p = "before/" + crypto.randomUUID() + "." + (file.name.split(".").pop() || "jpg").toLowerCase();
