@@ -79,3 +79,88 @@ main {
     font-size: 25px;
   }
 }
+
+/* Формы входа и регистрации */
+
+.auth-container {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 13px;
+  border: 1px solid #dce8df;
+  border-radius: 10px;
+  background: #f4f8f5;
+  color: #476353;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-tabs button.active {
+  background: #16834a;
+  color: white;
+  border-color: #16834a;
+}
+
+#authForm label {
+  display: block;
+  margin: 16px 0 7px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#authForm input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #dce8df;
+  border-radius: 10px;
+  background: white;
+  color: #183a2b;
+  font-size: 15px;
+}
+
+#authForm input:focus {
+  outline: 2px solid #16834a;
+  outline-offset: 1px;
+}
+
+#authSubmit {
+  width: 100%;
+  padding: 15px;
+  margin-top: 25px;
+  border: none;
+  border-radius: 10px;
+  background: #16834a;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#authSubmit:hover {
+  background: #106b3b;
+}
+
+#authSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#authMessage {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+[hidden] {
+  display: none !important;
+}
