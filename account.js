@@ -65,15 +65,19 @@ authForm.addEventListener("submit", async event => {
         throw new Error("Введите ваше имя.");
       }
 
-      const { data, error } = await sb.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            display_name: name
-          }
-        }
-      });
+      
+const { data, error } = await sb.auth.signUp({
+  email,
+  password,
+  options: {
+    emailRedirectTo: window.location.origin +
+      "/account.html",
+    data: {
+      display_name: name
+    }
+  }
+});
+
 
       if (error) throw error;
 
