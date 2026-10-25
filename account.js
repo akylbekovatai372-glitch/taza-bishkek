@@ -104,3 +104,48 @@ const { data, error } = await sb.auth.signUp({
 });
 
 switchAuthMode("login");
+
+const authSection = document.querySelector("#authSection");
+const myAccount = document.querySelector("#myAccount");
+const accountLogout = document.querySelector("#accountLogout");
+const myReports = document.querySelector("#myReports");
+
+async function updateAccountView() {
+  const { data: { user }, error } = await sb.auth.getUser();
+
+  if (error) {
+    console.error("Ошибка проверки аккаунта:", error);
+    return;
+  }
+
+  const loggedIn = user && !user.is_anonymous;
+
+  authSection.hidden = Boolean(loggedIn);
+  myAccount.hidden = !loggedIn;
+
+  if (loggedIn) {
+    myReports.textContent =
+      "Вы вошли в аккаунт. Скоро здесь появятся ваши заявки.";
+  }
+}
+
+accountLogout.addEventListener("click", async () => {
+  const { error } = await sb.auth.signOut();
+
+  if (error) {
+    alert("Не удалось выйти: " + error.message);
+    return;
+  }
+
+  userPassword.value = "";
+  await updateAccountView();
+});
+
+sb.auth.onAuthStateChange(() => {
+  // Выполняем запросы к Supabase после завершения callback.
+  setTimeout(() => {
+    updateAccountView().catch(console.error);
+  }, 0);
+});
+
+updateAccountView().catch(console.error);
