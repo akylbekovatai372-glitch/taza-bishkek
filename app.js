@@ -41,7 +41,13 @@ async list() {
       if (e1) throw e1;
       r.photo = sb.storage.from("photos").getPublicUrl(p).data.publicUrl;
     }
-    const { data, error } = await sb.from("reports").insert(r).select().single();
+    
+const { data, error } = await sb
+  .from("reports")
+  .insert(r)
+  .select("id")
+  .single();
+
     if (error) throw error; return data;
   },
   async setStatus(id, status, file) {
