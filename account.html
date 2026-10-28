@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мой аккаунт — Taza Bishkek</title>
+  <link rel="stylesheet" href="account.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">🌿 Taza Bishkek</div>
+      <a class="back-link" href="home.html">← На главную</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Вход и регистрация -->
+    <section id="authSection" class="account-card">
+      <div class="account-icon">👤</div>
+      <h1>Мой аккаунт</h1>
+
+      <p>
+        Войдите или зарегистрируйтесь, чтобы
+        отслеживать свои заявки и участвовать
+        в улучшении нашего города.
+      </p>
+
+      <div class="auth-container">
+
+        <div class="auth-tabs">
+          <button type="button" id="loginTab" class="active">
+            Войти
+          </button>
+          <button type="button" id="registerTab">
+            Регистрация
+          </button>
+        </div>
+
+        <form id="authForm">
+
+          <div id="nameField" hidden>
+            <label for="userName">Ваше имя</label>
+            <input
+              type="text"
+              id="userName"
+              placeholder="Введите имя"
+              autocomplete="name"
+            >
+          </div>
+
+          <label for="userEmail">Электронная почта</label>
+          <input
+            type="email"
+            id="userEmail"
+            placeholder="example@gmail.com"
+            autocomplete="email"
+            required
+          >
+
+          <label for="userPassword">Пароль</label>
+          <input
+            type="password"
+            id="userPassword"
+            placeholder="Введите пароль"
+            autocomplete="current-password"
+            minlength="8"
+            required
+          >
+
+          <button type="submit" id="authSubmit">
+            Войти
+          </button>
+
+          <p id="authMessage" role="status"></p>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- Личный кабинет -->
+    <section id="myAccount" class="account-card" hidden>
+      <div class="account-icon">🌿</div>
+      <h2>Мои заявки</h2>
+
+      <p>
+        Здесь будут отображаться обращения,
+        которые вы отправили в Taza Bishkek.
+      </p>
+
+      <div id="myReports">
+        <p>Заявки пока не загружены.</p>
+      </div>
+
+      <button type="button" id="accountLogout">
+        Выйти из аккаунта
+      </button>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="account.js"></script>
+
+</body>
+</html>
