@@ -102,3 +102,20 @@ header {
     font-size: 13px;
   }
 }
+
+.main-nav .back-home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #e8f5ed;
+  color: #16834a;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.main-nav .back-home:hover {
+  background: #d1ebda;
+}
