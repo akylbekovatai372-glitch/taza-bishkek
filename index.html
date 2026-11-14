@@ -4,6 +4,8 @@
 <title>Taza Bishkek — карта проблемных точек</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="i18n.css?v=1">
+<script src="i18n.js?v=1"></script>
 </head>
 <body>
 <header>
@@ -26,6 +28,7 @@
     🛡️ Панель модератора
   </button>
 </nav>
+<label class="language-switch" data-no-i18n><span class="language-caption">RU / KY</span><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label>
 </header>
 <main>
 <div id="map"></div>
@@ -80,6 +83,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=lang1"></script>
 </body></html>
    

@@ -5,7 +5,7 @@
   const client = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
   let user = null, moderator = false, rows = [], joined = new Set(), version = 0;
   const el = (tag, text, cls) => { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; };
-  const dateText = value => value ? new Date(value).toLocaleString('ru-RU', { timeZone:'Asia/Bishkek', dateStyle:'long', timeStyle:'short' }) + ' · Бишкек' : 'Дата пока не назначена';
+  const dateText = value => value ? I18N.date(value,{long:true,time:true}) + ' · Бишкек' : I18N.t('Дата пока не назначена');
   const fail = error => error?.code === '23505' ? 'Вы уже записаны на это мероприятие. Обновите список.'
     : error?.code === '42501' ? 'Проверьте вход в аккаунт и доступность записи.'
     : 'Проверьте соединение и попробуйте ещё раз.';
@@ -46,7 +46,7 @@
       const status = event.status === 'draft' ? 'Черновик' : event.status === 'cancelled' ? 'Отменено' : !future ? 'Прошедшее' : event.registration_open ? 'Запись открыта' : 'Запись закрыта';
       content.append(el('span',status,'event-status'),el('h3',event.title,'event-title'));
       if (event.description) content.append(el('p',event.description,'event-description'));
-      for (const text of ['📅 ' + dateText(event.event_date), '📍 ' + (event.location || 'Место уточняется'), 'Организатор: ' + event.organizer, 'Правила участия: ' + (event.safety_rules || 'Уточняются у организатора')]) content.append(el('p',text,'event-info'));
+      for (const text of ['📅 ' + dateText(event.event_date), '📍 ' + (event.location || I18N.t('Место уточняется')), I18N.t('Организатор: {name}',{name:event.organizer}), I18N.t('Правила участия: {rules}',{rules:event.safety_rules || I18N.t('Уточняются у организатора')})]) content.append(el('p',text,'event-info'));
       const registered = joined.has(event.id);
       const button = el('button', registered ? 'Отменить участие' : !user || user.is_anonymous ? 'Войти для записи' : future && event.registration_open && event.status === 'reviewed' ? 'Записаться' : 'Запись закрыта','event-button');
       button.type = 'button';
@@ -99,6 +99,7 @@
     finally { submit.disabled=false; }
   };
   if (location.hash === '#mine') $('#eventFilter').value = 'mine';
+  window.addEventListener('languagechange',render);
   $('#eventNew').onclick=()=>editEvent();
   $('#eventFilter').onchange=render;
   $('#eventsRefresh').onclick=load;

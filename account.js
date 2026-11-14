@@ -68,11 +68,7 @@ function formatDate(value) {
     return "Дата неизвестна";
   }
 
-  return date.toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
+  return I18N.date(value,{long:true});
 }
 
 function createElement(tag, className, text) {
@@ -522,13 +518,14 @@ function createReportCard(report) {
   const type = createElement(
     "p",
     "report-type",
-    report.type || "Тип не указан"
+    I18N.category(report.type) || I18N.t("Тип не указан")
   );
 
+  type.dataset.userContent = "";
   const description = createElement(
     "p",
     "report-description",
-    report.description || "Без описания"
+    report.description || I18N.t("Без описания")
   );
 
   const date = createElement(
@@ -727,12 +724,12 @@ function renderDashboard() {
 
   const displayName =
     currentUser?.user_metadata?.display_name ||
-    "Пользователь";
+    I18N.t("Пользователь");
 
   const greeting = createElement(
     "h3",
     "profile-title",
-    "Здравствуйте, " + displayName + "!"
+    I18N.t("Здравствуйте, {name}!", {name:displayName})
   );
 
   const email = createElement(
@@ -1175,3 +1172,12 @@ document.head.appendChild(accountStyles);
 switchAuthMode("login");
 
 updateAccountView().catch(console.error);
+
+window.addEventListener('languagechange', () => {
+  authSubmit.textContent = I18N.t(authMode === "register" ? "Зарегистрироваться" : "Войти");
+  if(currentUser) {
+    const cleanupsActive = document.querySelector('.dashboard-tabs button:last-child')?.classList.contains('active');
+    renderDashboard();
+    if(cleanupsActive) document.querySelector('.dashboard-tabs button:last-child')?.click();
+  }
+});

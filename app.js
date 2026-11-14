@@ -98,7 +98,7 @@ async function renderVolunteerBox(container, report) {
         await toggleCleanup(report.id);
         await renderVolunteerBox(container, report);
       } catch (error) {
-        alert("Ошибка: " + error.message);
+        I18N.alert("Ошибка: " + error.message);
         button.disabled = false;
       }
     };
@@ -210,7 +210,7 @@ let pick = null, pickMarker = null, reports = [];
 
 function setPick(ll) {
   if (!BISHKEK_VIEW_BOUNDS.contains(ll)) {
-    alert("Пока заявки принимаются только в Бишкеке.");
+    I18N.alert("Пока заявки принимаются только в Бишкеке.");
     return;
   }
 
@@ -228,7 +228,7 @@ function setPick(ll) {
 
       if (!BISHKEK_VIEW_BOUNDS.contains(newPoint)) {
         e.target.setLatLng(pick);
-        alert("Точка находится вне разрешённой области.");
+        I18N.alert("Точка находится вне разрешённой области.");
         return;
       }
 
@@ -287,9 +287,9 @@ function renderMap() {
       ).addTo(layer);
 
       marker.bindPopup(`
-        <b>${code(r.id)}</b> · ${esc(r.status)}
-        <br>${esc(r.type)}
-        <br>${esc(r.description || "")}
+        <b>${code(r.id)}</b> · ${esc(I18N.t(r.status))}
+        <br><span data-user-content>${esc(I18N.category(r.type))}</span>
+        <br><span data-user-content>${esc(r.description || "")}</span>
 
         <div class="ba">
           ${r.photo ? `
@@ -369,10 +369,10 @@ async function syncModerator() {
 }
 $("#login").onsubmit = async e => {
   e.preventDefault();
-  if (!sb) return alert("Для безопасной модерации подключите Supabase.");
+  if (!sb) return I18N.alert("Для безопасной модерации подключите Supabase.");
   const email = $("#email").value.trim();
   const password = $("#pw").value;
-  if (!email || !password) return alert("Введите email и пароль.");
+  if (!email || !password) return I18N.alert("Введите email и пароль.");
   $("#loginBtn").disabled = true;
   try {
     const { error } = await sb.auth.signInWithPassword({ email, password });
@@ -380,9 +380,9 @@ $("#login").onsubmit = async e => {
     await syncModerator();
     if (!isModerator) {
       await sb.auth.signOut();
-      alert("Эта учётная запись не назначена модератором.");
+      I18N.alert("Эта учётная запись не назначена модератором.");
     }
-  } catch (e) { alert("Не удалось войти: " + e.message); }
+  } catch (e) { I18N.alert("Не удалось войти: " + e.message); }
   finally { $("#pw").value = ""; $("#loginBtn").disabled = false; }
 };
 $("#logoutBtn").onclick = async () => {
@@ -411,13 +411,13 @@ function renderList() {
   $("#modNext").disabled = modPage >= pages;
   $("#list").innerHTML = filtered.slice((modPage - 1) * MOD_PAGE_SIZE, modPage * MOD_PAGE_SIZE).map(r => {
     const date = new Date(r.created_at);
-    const stamp = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("ru-RU");
+    const stamp = Number.isNaN(date.getTime()) ? "" : I18N.date(r.created_at);
     return `<details class="mod-card" data-id="${r.id}">
-      <summary><span class="mod-card-code">${code(r.id)}</span><span class="mod-card-title">${esc(r.type)}<small>${esc(stamp)}</small></span><span class="mod-badge status-${ST.indexOf(r.status)}">${esc(r.status)}</span><span class="mod-expand" aria-hidden="true">⌄</span></summary>
+      <summary><span class="mod-card-code">${code(r.id)}</span><span class="mod-card-title"><span data-user-content>${esc(I18N.category(r.type))}</span><small>${esc(stamp)}</small></span><span class="mod-badge status-${ST.indexOf(r.status)}">${esc(I18N.t(r.status))}</span><span class="mod-expand" aria-hidden="true">⌄</span></summary>
       <div class="mod-card-body">
-       <p class="mod-description">${esc(r.description || "Описание не добавлено.")}</p>
+       <p class="mod-description">${esc(r.description || I18N.t("Описание не добавлено."))}</p>
        <div class="mod-photos"></div>
-       <div class="mod-edit"><label>Новый статус<select class="mod-status">${ST.map(status => `<option${status === r.status ? " selected" : ""}>${status}</option>`).join("")}</select></label>
+       <div class="mod-edit"><label>Новый статус<select class="mod-status">${ST.map(status => `<option value="${esc(status)}"${status === r.status ? " selected" : ""}>${status}</option>`).join("")}</select></label>
        <label>Фото «после»${r.photo_after ? ' <small>Уже добавлено · можно заменить</small>' : ""}<input type="file" accept="image/*" class="after"></label>
        <button type="button" class="mod-save">Сохранить изменения</button></div>
        ${r.cleanup_enabled ? `<div class="mod-cleanup">Запись на уборку открыта <button type="button" class="cleanup-close">Закрыть запись</button></div>` : ""}
@@ -508,7 +508,7 @@ async function startApp() {
   } catch (err) {
     console.error(step, err);
 
-    alert(
+    I18N.alert(
       "Этап: " + step +
       "\nОшибка: " + (err.message || err)
     );
@@ -517,3 +517,16 @@ async function startApp() {
 
 startApp();
 
+
+window.addEventListener('languagechange', () => {
+  renderMap();
+  // Keep unsaved moderator selects and attached files while changing labels.
+  document.querySelectorAll('.mod-card').forEach(card => {
+    const r = reports.find(report => String(report.id) === card.dataset.id);
+    if(!r) return;
+    card.querySelector('.mod-card-title [data-user-content]').textContent = I18N.category(r.type);
+    if(!r.description) card.querySelector('.mod-description').textContent = I18N.t('Описание не добавлено.');
+    const date = new Date(r.created_at);
+    card.querySelector('.mod-card-title small').textContent = Number.isNaN(date.getTime()) ? '' : I18N.date(r.created_at);
+  });
+});
