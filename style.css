@@ -221,3 +221,9 @@ header {
   color: #dc2626;
   cursor: pointer;
 }
+.map-filters { margin-bottom: 22px; padding: 12px; background: #f1f8f3; border-radius: 10px; }
+.map-filters summary { cursor: pointer; font-weight: 600; }
+.map-filters form { margin-top: 12px; }
+.map-filters label { display: grid; gap: 4px; font-size: 14px; }
+#filterCount { margin-bottom: 0; font-size: 13px; }
+button:disabled { opacity: .65; cursor: wait; }

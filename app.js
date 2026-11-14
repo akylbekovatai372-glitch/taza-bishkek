@@ -235,7 +235,11 @@ function setPick(ll) {
 
 map.on("click", e => setPick(e.latlng));
 $("#geo").onclick = () => navigator.geolocation.getCurrentPosition(p => {
-  const ll = L.latLng(p.coords.latitude, p.coords.longitude); map.setView(ll, 16); setPick(ll);
+  const ll = L.latLng(p.coords.latitude, p.coords.longitude);
+  setPick(ll);
+  if (BISHKEK_VIEW_BOUNDS.contains(ll)) map.setView(ll, 16);
+}, () => {
+  $("#msg").textContent = "Не удалось определить местоположение. Отметьте место на карте вручную.";
 });
 
 // Дубликаты: незакрытая точка ближе 30 м
@@ -248,10 +252,27 @@ function checkDup() {
 async function load() {
   reports = await store.list();
 
+  renderMap();
+  renderList();
+  checkDup();
+}
+
+function renderMap() {
   layer.clearLayers();
 
-  reports
-    .filter(r => r.status !== "Убрано")
+  const fields = new FormData($("#mapFilters"));
+  const status = fields.get("status");
+  const type = fields.get("type");
+  const since = fields.get("since");
+  const visible = reports.filter(r => {
+    if (status === "active" && r.status === "Убрано") return false;
+    if (!["active", "all"].includes(status) && r.status !== status) return false;
+    if (type && r.type !== type) return false;
+    if (since && (!r.created_at || new Date(r.created_at) < new Date(since + "T00:00:00"))) return false;
+    return true;
+  });
+  $("#filterCount").textContent = `На карте: ${visible.length} из ${reports.length} заявок`;
+  visible
     .forEach(r => {
 
       const marker = L.marker(
@@ -295,8 +316,11 @@ async function load() {
 
     });
 
-  renderList();
 }
+
+$("#mapFilters").addEventListener("change", renderMap);
+$("#mapFilters").addEventListener("submit", e => e.preventDefault());
+$("#mapFilters").addEventListener("reset", () => setTimeout(renderMap, 0));
 
 // ---- Форма ----
 $("#form").onsubmit = async e => {
