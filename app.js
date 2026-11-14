@@ -62,7 +62,7 @@ async function toggleCleanup(reportId) {
 async function renderVolunteerBox(container, report) {
   if (!sb || !container) return;
 
-  if (!["Проверена", "В работе"].includes(report.status)) {
+  if (!report.cleanup_enabled || !["Проверена", "В работе"].includes(report.status)) {
     container.hidden = true;
     return;
   }
@@ -125,7 +125,7 @@ const store = sb ? {
 async list() {
   const { data, error } = await sb
     .from("reports")
-    .select("id,type,description,lat,lng,status,photo,photo_after,created_at")
+    .select("id,type,description,lat,lng,status,photo,photo_after,created_at,cleanup_enabled")
     .order("id");
 
   if (error) throw error;
@@ -346,12 +346,61 @@ $("#logoutBtn").onclick = async () => {
 };
 function renderList() {
   if (!isModerator) return;
+
   $("#list").innerHTML = reports.slice().reverse().map(r =>
-    `<div class="item"><b>${code(r.id)}</b> ${esc(r.type)}<br><small>${esc(r.description || "")}</small>
-     <select data-id="${r.id}">${ST.map(s => `<option${s == r.status ? " selected" : ""}>${s}</option>`).join("")}</select><br>
-     ${r.photo_after ? "<small>Фото «после» добавлено</small>" : `<label><small>Фото «после» (нужно для «Убрано»):</small><input type="file" accept="image/*" class="after"></label>`}</div>`
+    `<div class="item">
+      <b>${code(r.id)}</b> ${esc(r.type)}
+      <br><small>${esc(r.description || "")}</small>
+
+      <select data-id="${r.id}">
+        ${ST.map(s => `<option${s == r.status ? " selected" : ""}>${s}</option>`).join("")}
+      </select>
+
+      <br>
+
+      ${r.photo_after
+        ? "<small>Фото «после» добавлено</small>"
+        : `<label><small>Фото «после»:</small>
+           <input type="file" accept="image/*" class="after">
+           </label>`}
+
+      <small class="cleanup-control">
+        ${r.cleanup_enabled
+          ? "Запись на уборку открыта"
+          : "Запись на уборку закрыта"}
+      </small>
+
+      ${r.cleanup_enabled ? `
+        <button type="button"
+                class="cleanup-close"
+                data-report="${r.id}">
+          Закрыть запись
+        </button>
+      ` : ""}
+    </div>`
   ).join("") || "<p>Заявок пока нет</p>";
 }
+
+$("#list").addEventListener("click", async e => {
+  const button = e.target.closest(".cleanup-close");
+  if (!button || !isModerator || !sb) return;
+
+  button.disabled = true;
+
+  try {
+    const { error } = await sb
+      .from("reports")
+      .update({ cleanup_enabled: false })
+      .eq("id", button.dataset.report);
+
+    if (error) throw error;
+
+    await load();
+  } catch (error) {
+    alert("Ошибка: " + error.message);
+    button.disabled = false;
+  }
+});
 $("#list").onchange = async e => {
   if (!isModerator || e.target.tagName !== "SELECT") return;
   const id = e.target.dataset.id, status = e.target.value;
