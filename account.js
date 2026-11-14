@@ -263,7 +263,6 @@ async function loadMyReports(version = requestVersion) {
     if (error) throw error;
 
     allReports = Array.isArray(data) ? data : [];
-
     renderDashboard();
 
   } catch (error) {
@@ -635,6 +634,79 @@ function renderReportList(container) {
 // ГЛАВНАЯ ПАНЕЛЬ АККАУНТА
 // ==========================================
 
+// ---- Мои уборки ----
+
+async function renderMyCleanups(container) {
+  const version = requestVersion;
+
+  container.textContent = "Загрузка уборок...";
+
+  try {
+    const { data, error } = await sb.rpc(
+      "get_my_cleanups"
+    );
+
+    if (version !== requestVersion || !currentUser) return;
+    if (error) throw error;
+
+    container.replaceChildren();
+
+    if (!data || data.length === 0) {
+      container.appendChild(
+        createElement(
+          "p",
+          "reports-empty",
+          "Вы пока не записаны ни на одну уборку."
+        )
+      );
+      return;
+    }
+
+    for (const report of data) {
+      const card = createReportCard(report);
+
+      const button = createElement(
+        "button",
+        "cleanup-leave-btn",
+        "Отказаться от участия"
+      );
+
+      button.type = "button";
+
+      button.onclick = async () => {
+        button.disabled = true;
+
+        try {
+          const { error } = await sb.rpc(
+            "leave_cleanup",
+            { p_report_id: report.id }
+          );
+
+          if (error) throw error;
+
+          await renderMyCleanups(container);
+
+        } catch (error) {
+          alert(error.message);
+          button.disabled = false;
+        }
+      };
+
+      if (report.status !== "Убрано") {
+        card.appendChild(button);
+      }
+
+      container.appendChild(card);
+    }
+
+  } catch (error) {
+    if (version !== requestVersion) return;
+
+    container.textContent =
+      "Ошибка загрузки: " + error.message;
+  }
+}
+
 function renderDashboard() {
   myReports.replaceChildren();
 
@@ -690,34 +762,77 @@ function renderDashboard() {
 
   actions.append(newReport, refresh);
 
-  const heading = createElement(
-    "h3",
-    "reports-heading",
-    "История обращений"
+
+  const tabs = createElement("div", "dashboard-tabs");
+
+  const reportsTab = createElement(
+    "button", "dashboard-tab active", "Мои заявки"
   );
 
-  const list = createElement(
-    "div",
-    "reports-list"
+  const cleanupsTab = createElement(
+    "button", "dashboard-tab", "Мои уборки"
   );
+
+  reportsTab.type = "button";
+  cleanupsTab.type = "button";
+
+  tabs.append(reportsTab, cleanupsTab);
+
+  const reportsPanel = createElement("section", "dashboard-panel");
+  const cleanupPanel = createElement("section", "dashboard-panel");
+
+  const heading = createElement(
+    "h3", "reports-heading", "История обращений"
+  );
+
+  const list = createElement("div", "reports-list");
 
   const filters = createFilters(() => {
     renderReportList(list);
   });
 
+  reportsPanel.append(heading, filters, list);
+
+  const cleanupHeading = createElement(
+    "h3", "reports-heading", "Мои уборки"
+  );
+
+  const cleanupList = createElement("div", "reports-list");
+
+  cleanupPanel.append(cleanupHeading, cleanupList);
+
+  cleanupPanel.hidden = true;
+
+  function switchTab(tab) {
+    const showReports = tab === "reports";
+
+    reportsPanel.hidden = !showReports;
+    cleanupPanel.hidden = showReports;
+
+    reportsTab.classList.toggle("active", showReports);
+    cleanupsTab.classList.toggle("active", !showReports);
+
+    if (!showReports) {
+      renderMyCleanups(cleanupList);
+    }
+  }
+
+  reportsTab.onclick = () => switchTab("reports");
+  cleanupsTab.onclick = () => switchTab("cleanups");
+
   myReports.append(
     profile,
     statistics,
     actions,
-    heading,
-    filters,
-    list
+    tabs,
+    reportsPanel,
+    cleanupPanel
   );
 
   renderReportList(list);
+
 }
 
-// ==========================================
 // ВЫХОД ИЗ АККАУНТА
 // ==========================================
 

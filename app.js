@@ -6,6 +6,104 @@ const code = id => "TB-" + String(id).padStart(3, "0");
 const esc = s => String(s).replace(/[&<>"']/g, c => "&#" + c.charCodeAt(0) + ";");
 const sb = C.SUPABASE_URL && C.SUPABASE_KEY ? supabase.createClient(C.SUPABASE_URL, C.SUPABASE_KEY) : null;
 let isModerator = false;
+// ---- Система волонтёров ----
+
+async function getHelpersCount(reportId) {
+  if (!sb) return 0;
+
+  const { data, error } = await sb.rpc(
+    "get_helpers_count",
+    { p_report_id: reportId }
+  );
+
+  if (error) throw error;
+
+  return Number(data || 0);
+}
+
+async function isJoined(reportId) {
+  if (!sb) return false;
+
+  const { data: { user } } = await sb.auth.getUser();
+
+  if (!user || user.is_anonymous) return false;
+
+  const { data, error } = await sb
+    .from("report_helpers")
+    .select("id")
+    .eq("report_id", reportId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return !!data;
+}
+
+async function toggleCleanup(reportId) {
+  if (!sb) return;
+
+  const { data: { user } } = await sb.auth.getUser();
+
+  if (!user || user.is_anonymous) {
+    window.location.href = "account.html";
+    return;
+  }
+
+  const joined = await isJoined(reportId);
+
+  const { error } = await sb.rpc(
+    joined ? "leave_cleanup" : "join_cleanup",
+    { p_report_id: reportId }
+  );
+
+  if (error) throw error;
+}
+async function renderVolunteerBox(container, report) {
+  if (!sb || !container) return;
+
+  if (!["Проверена", "В работе"].includes(report.status)) {
+    container.hidden = true;
+    return;
+  }
+
+  try {
+    const count = await getHelpersCount(report.id);
+    const joined = await isJoined(report.id);
+
+    container.innerHTML = `
+      <div class="volunteer-count">
+        👥 Участников: ${count}
+      </div>
+
+      <button class="volunteer-btn ${joined ? "joined" : ""}">
+        ${joined ? "Отказаться от участия" : "Хочу помочь"}
+      </button>
+
+      <small class="volunteer-note">
+        Участие только в организованных безопасных уборках.
+      </small>
+    `;
+
+    const button = container.querySelector("button");
+
+    button.onclick = async () => {
+      button.disabled = true;
+
+      try {
+        await toggleCleanup(report.id);
+        await renderVolunteerBox(container, report);
+      } catch (error) {
+        alert("Ошибка: " + error.message);
+        button.disabled = false;
+      }
+    };
+
+  } catch (error) {
+    container.textContent = "Не удалось загрузить участников.";
+    console.error(error);
+  }
+}
 
 async function ensureAnonymousUser() {
   if (!sb) return;
@@ -141,10 +239,54 @@ function checkDup() {
 
 async function load() {
   reports = await store.list();
+
   layer.clearLayers();
-  reports.filter(r => r.status !== "Убрано").forEach(r => L.marker([r.lat, r.lng], { icon: dot(COL[ST.indexOf(r.status)]) }).addTo(layer).bindPopup(
-    `<b>${code(r.id)}</b> · ${esc(r.status)}<br>${esc(r.type)}<br>${esc(r.description || "")}` +
-    `<div class="ba">${r.photo ? `<figure>До<img src="${esc(r.photo)}"></figure>` : ""}${r.photo_after ? `<figure>После<img src="${esc(r.photo_after)}"></figure>` : ""}</div>`));
+
+  reports
+    .filter(r => r.status !== "Убрано")
+    .forEach(r => {
+
+      const marker = L.marker(
+        [r.lat, r.lng],
+        { icon: dot(COL[ST.indexOf(r.status)]) }
+      ).addTo(layer);
+
+      marker.bindPopup(`
+        <b>${code(r.id)}</b> · ${esc(r.status)}
+        <br>${esc(r.type)}
+        <br>${esc(r.description || "")}
+
+        <div class="ba">
+          ${r.photo ? `
+            <figure>
+              До
+              <img src="${esc(r.photo)}">
+            </figure>
+          ` : ""}
+
+          ${r.photo_after ? `
+            <figure>
+              После
+              <img src="${esc(r.photo_after)}">
+            </figure>
+          ` : ""}
+        </div>
+
+        <div class="volunteer-box">
+          Загрузка...
+        </div>
+      `);
+
+      marker.on("popupopen", e => {
+        const container = e.popup
+          .getElement()
+          .querySelector(".volunteer-box");
+
+        renderVolunteerBox(container, r);
+      });
+
+    });
+
   renderList();
 }
 
@@ -233,13 +375,21 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 $("#legend").innerHTML = ST.map((s, i) => `<span><i class="pin" style="background:${COL[i]}"></i>${s}</span>`).join("");
 
 async function startApp() {
+  let step = "Проверка модератора";
+
   try {
-    await ensureAnonymousUser();
     await syncModerator();
+
+    step = "Загрузка заявок";
     await load();
+
   } catch (err) {
-    console.error("Ошибка запуска:", err);
-    alert("Не удалось загрузить сайт. Попробуйте обновить страницу.");
+    console.error(step, err);
+
+    alert(
+      "Этап: " + step +
+      "\nОшибка: " + (err.message || err)
+    );
   }
 }
 
