@@ -62,6 +62,7 @@ loadStatistics();
 
 const statusForm = document.querySelector("#statusForm");
 const statusResult = document.querySelector("#statusResult");
+let lastStatusReport = null;
 
 statusForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -69,6 +70,7 @@ statusForm.addEventListener("submit", async (event) => {
   const input = document.querySelector("#reportCode");
   const value = input.value.trim().toUpperCase();
 
+  lastStatusReport = null;
   const match = /^TB-(\d{1,12})$/.exec(value);
 
   if (!match || Number(match[1]) === 0) {
@@ -100,19 +102,8 @@ statusForm.addEventListener("submit", async (event) => {
       return;
     }
 
-    const formattedId =
-      "TB-" + String(data.id).padStart(3, "0");
-
-    statusResult.replaceChildren();
-
-    const title = document.createElement("strong");
-    title.textContent = formattedId;
-
-    const details = document.createElement("p");
-    details.textContent =
-      `${data.type} — статус: ${data.status}`;
-
-    statusResult.append(title, details);
+    lastStatusReport = data;
+    renderStatusResult();
 
   } catch (error) {
     console.error("Status search error:", error);
@@ -121,3 +112,16 @@ statusForm.addEventListener("submit", async (event) => {
   }
 });
 
+
+function renderStatusResult() {
+  if(!lastStatusReport) return;
+  const data = lastStatusReport;
+  statusResult.replaceChildren();
+  const title = document.createElement("strong");
+  title.textContent = "TB-" + String(data.id).padStart(3,"0");
+  const details = document.createElement("p");
+  details.dataset.userContent = "";
+  details.textContent = I18N.t("{type} — статус: {status}", {type:I18N.category(data.type),status:I18N.t(data.status)});
+  statusResult.append(title,details);
+}
+window.addEventListener('languagechange',renderStatusResult);

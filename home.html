@@ -7,6 +7,8 @@
         content="width=device-width, initial-scale=1.0">
   <title>Taza Bishkek — Чистый город</title>
   <link rel="stylesheet" href="home.css">
+<link rel="stylesheet" href="i18n.css?v=1">
+<script src="i18n.js?v=1"></script>
 </head>
 
 <body>
@@ -37,7 +39,7 @@
   <a href="account.html">Мой аккаунт</a>
 </nav>
     <div class="header-actions">
-      <button type="button" disabled>RU / KG</button>
+      <label class="language-switch" data-no-i18n><span class="language-caption">RU / KY</span><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label>
     </div>
   </header>
 
@@ -213,6 +215,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
-<script src="home.js"></script>
+<script src="home.js?v=lang1"></script>
 </body>
 </html>
