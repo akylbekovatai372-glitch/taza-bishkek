@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Мероприятия — Taza Bishkek</title>
-  <link rel="stylesheet" href="events.css?v=2">
+  <link rel="stylesheet" href="events.css?v=3">
 </head>
 <body>
 
@@ -28,11 +28,30 @@
       <p>Вместе сделаем наш город чище и лучше.</p>
     </section>
 
-    <div class="notice">
-      🌱 Раздел находится в разработке.
-      Сейчас доступна демонстрационная версия.
+    <p class="notice">Записывайтесь только на организованные уборки. Проверьте дату, место встречи и правила. Несовершеннолетним — согласовать участие с родителем или ответственным взрослым.</p>
+    <section id="eventAdmin" hidden>
+      <details id="eventEditor"><summary>Управление мероприятиями</summary>
+        <button id="eventNew" type="button">Новое мероприятие</button>
+        <form id="eventForm">
+          <input name="id" type="hidden">
+          <label>Название<input name="title" required minlength="3" maxlength="150"></label>
+          <label>Описание<textarea name="description" maxlength="4000"></textarea></label>
+          <label>Организатор<input name="organizer" required maxlength="200"></label>
+          <label>Дата и время в Бишкеке<input name="event_date" type="datetime-local"></label>
+          <label>Место встречи<input name="location" maxlength="500"></label>
+          <label>Правила участия<textarea name="safety_rules" maxlength="4000" placeholder="Ответственный, инвентарь, ограничения и безопасная зона уборки"></textarea></label>
+          <label>Состояние<select name="status"><option value="draft">Черновик</option><option value="reviewed">Опубликовано</option><option value="cancelled">Отменено</option></select></label>
+          <label class="event-check"><input name="registration_open" type="checkbox"> Открыть запись после публикации</label>
+          <button id="eventSave" type="submit">Сохранить</button>
+          <p id="eventSaveMessage" role="status" aria-live="polite"></p>
+        </form>
+      </details>
+    </section>
+    <div class="events-toolbar">
+      <label>Показать<select id="eventFilter"><option value="upcoming">Предстоящие</option><option value="mine">Моё участие</option><option value="all">Все мероприятия</option></select></label>
+      <button id="eventsRefresh" type="button">Обновить</button>
     </div>
-
+    <p id="eventsMessage" role="status" aria-live="polite"></p>
     <section class="events-section">
 
       <div class="section-heading">
@@ -50,7 +69,9 @@
     © 2026 Taza Bishkek
   </footer>
 
-  <script src="events.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="events.js?v=3"></script>
 
 </body>
 </html>

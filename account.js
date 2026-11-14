@@ -203,11 +203,21 @@ authForm.addEventListener("submit", async event => {
 async function updateAccountView() {
   const version = ++requestVersion;
 
-  const { data, error } = await sb.auth.getUser();
+  const session = await sb.auth.getSession();
+  const { data, error } = session.error
+    ? { data: { user: null }, error: session.error }
+    : session.data.session
+      ? await sb.auth.getUser()
+      : { data: { user: null }, error: null };
 
   if (version !== requestVersion) return;
 
   if (error) {
+    currentUser = null;
+    allReports = [];
+    authSection.hidden = false;
+    myAccount.hidden = true;
+    myReports.replaceChildren();
     console.error("Ошибка авторизации:", error);
     showAuthMessage(
       "Не удалось проверить аккаунт. Обновите страницу.",
@@ -760,7 +770,9 @@ function renderDashboard() {
     loadMyReports().catch(console.error);
   });
 
-  actions.append(newReport, refresh);
+  const myEvents = createElement("a", "reports-btn reports-btn-secondary", "Мои мероприятия");
+  myEvents.href = "events.html#mine";
+  actions.append(newReport, myEvents, refresh);
 
 
   const tabs = createElement("div", "dashboard-tabs");
