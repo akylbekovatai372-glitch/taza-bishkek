@@ -133,6 +133,14 @@ async list() {
 },
 
   async add(r, file) {
+    await ensureAnonymousUser();
+    const { data: { user }, error: authError } = await sb.auth.getUser();
+    if (authError) throw authError;
+    if (!user) throw new Error("Не удалось войти. Попробуйте отправить заявку ещё раз.");
+    r.user_id = user.id;
+    r.status = "Новая";
+    r.photo_after = null;
+    r.cleanup_enabled = false;
     if (file) {
       const p = "before/" + crypto.randomUUID() + "." + (file.name.split(".").pop() || "jpg").toLowerCase();
       const { error: e1 } = await sb.storage.from("photos").upload(p, file);
@@ -295,12 +303,17 @@ $("#form").onsubmit = async e => {
   e.preventDefault();
   if (!pick) return ($("#msg").textContent = "Сначала отметьте место на карте.");
   const f = e.target;
+  const submitButton = f.querySelector('[type="submit"]');
+  if (submitButton?.disabled) return;
+  if (submitButton) submitButton.disabled = true;
+  $("#msg").textContent = "Отправка заявки...";
   try {
     const fields = new FormData(f);
     const r = await store.add({ type: fields.get("type"), description: fields.get("desc"), lat: pick.lat, lng: pick.lng, ...(sb ? {} : { status: "Новая" }) }, f.elements.namedItem("photo").files[0]);
     $("#msg").textContent = "Заявка принята. Ваш номер: " + code(r.id);
     f.reset(); await load();
   } catch (err) { $("#msg").textContent = "Ошибка: " + (err.message || err); }
+  finally { if (submitButton) submitButton.disabled = false; }
 };
 
 // ---- Модератор ----
