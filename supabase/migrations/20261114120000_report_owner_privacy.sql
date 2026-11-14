@@ -11,10 +11,6 @@ GRANT SELECT (
     photo, photo_after, created_at, cleanup_enabled
 ) ON TABLE public.reports TO anon, authenticated;
 
--- This function already limits rows to auth.uid(). A definer is needed
--- because callers no longer have SELECT access to reports.user_id.
--- Fully qualified relations and the empty search path prevent shadowing.
-ALTER FUNCTION public.get_my_cleanups() SECURITY DEFINER;
-ALTER FUNCTION public.get_my_cleanups() SET search_path = '';
-
+-- get_my_cleanups remains SECURITY INVOKER: it only reads public report
+-- columns and its own participation rows, which are protected by RLS.
 COMMIT;
