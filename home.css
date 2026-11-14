@@ -400,3 +400,23 @@ body {
     width: 100%;
   }
 }
+.events-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+}
+
+.event-card {
+  max-width: 450px;
+  width: 100%;
+}
+
+.event-banner {
+  min-height: 160px;
+}
+
+.event-title {
+  font-size: 22px;
+}
+
+.event-content {
+  padding: 20px;
+}
