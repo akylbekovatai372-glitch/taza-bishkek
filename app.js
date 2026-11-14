@@ -6,6 +6,9 @@ const code = id => "TB-" + String(id).padStart(3, "0");
 const esc = s => String(s).replace(/[&<>"']/g, c => "&#" + c.charCodeAt(0) + ";");
 const sb = C.SUPABASE_URL && C.SUPABASE_KEY ? supabase.createClient(C.SUPABASE_URL, C.SUPABASE_KEY) : null;
 let isModerator = false;
+let modPage = 1;
+const MOD_PAGE_SIZE = 12;
+let modBusy = false;
 // ---- Система волонтёров ----
 
 async function getHelpersCount(reportId) {
@@ -165,7 +168,9 @@ const { data, error } = await sb
       if (e1) throw e1;
       patch.photo_after = sb.storage.from("photos").getPublicUrl(p).data.publicUrl;
     }
-    const { error } = await sb.from("reports").update(patch).eq("id", id); if (error) throw error;
+    const { data, error } = await sb.from("reports").update(patch).eq("id", id).select("id");
+    if (error) throw error;
+    if (!data?.length) throw new Error("Заявка недоступна или права изменились.");
   }
 } : {
   async list() { return JSON.parse(localStorage.tz || "[]"); },
@@ -353,6 +358,7 @@ async function syncModerator() {
   }
   $("#login").hidden = isModerator;
   $("#list").hidden = !isModerator;
+  $("#modWorkspace").hidden = !isModerator;
   $("#logoutBtn").hidden = !isModerator;
   $("#modHelp").textContent = !sb
     ? "Демо-режим: доступ модератора отключён. Подключите Supabase."
@@ -360,7 +366,8 @@ async function syncModerator() {
   if (isModerator) renderList();
   else $("#list").replaceChildren();
 }
-$("#loginBtn").onclick = async () => {
+$("#login").onsubmit = async e => {
+  e.preventDefault();
   if (!sb) return alert("Для безопасной модерации подключите Supabase.");
   const email = $("#email").value.trim();
   const password = $("#pw").value;
@@ -381,72 +388,96 @@ $("#logoutBtn").onclick = async () => {
   if (sb) await sb.auth.signOut();
   await syncModerator();
 };
-function renderList() {
-  if (!isModerator) return;
-
-  $("#list").innerHTML = reports.slice().reverse().map(r =>
-    `<div class="item">
-      <b>${code(r.id)}</b> ${esc(r.type)}
-      <br><small>${esc(r.description || "")}</small>
-
-      <select data-id="${r.id}">
-        ${ST.map(s => `<option${s == r.status ? " selected" : ""}>${s}</option>`).join("")}
-      </select>
-
-      <br>
-
-      ${r.photo_after
-        ? "<small>Фото «после» добавлено</small>"
-        : `<label><small>Фото «после»:</small>
-           <input type="file" accept="image/*" class="after">
-           </label>`}
-
-      <small class="cleanup-control">
-        ${r.cleanup_enabled
-          ? "Запись на уборку открыта"
-          : "Запись на уборку закрыта"}
-      </small>
-
-      ${r.cleanup_enabled ? `
-        <button type="button"
-                class="cleanup-close"
-                data-report="${r.id}">
-          Закрыть запись
-        </button>
-      ` : ""}
-    </div>`
-  ).join("") || "<p>Заявок пока нет</p>";
+function filteredModerationReports() {
+  const query = $("#modSearch").value.trim().toLowerCase();
+  const status = $("#modStatus").value;
+  return reports.filter(r => {
+    if (status === "active" && r.status === "Убрано") return false;
+    if (!["active", "all"].includes(status) && r.status !== status) return false;
+    return !query || `${code(r.id)} ${r.type} ${r.description || ""}`.toLowerCase().includes(query);
+  }).sort((a, b) => $("#modSort").value === "old" ? a.id - b.id : b.id - a.id);
 }
 
-$("#list").addEventListener("click", async e => {
-  const button = e.target.closest(".cleanup-close");
-  if (!button || !isModerator || !sb) return;
+function renderList() {
+  if (!isModerator) return;
+  $("#modSummary").innerHTML = ST.map((status, i) => `<div class="mod-stat"><span>${esc(status)}</span><strong>${reports.filter(r => r.status === status).length}</strong></div>`).join("");
+  const filtered = filteredModerationReports();
+  const pages = Math.max(1, Math.ceil(filtered.length / MOD_PAGE_SIZE));
+  modPage = Math.min(modPage, pages);
+  $("#modCount").textContent = `Найдено: ${filtered.length} · Всего заявок: ${reports.length}`;
+  $("#modPage").textContent = `${modPage} / ${pages}`;
+  $("#modPrev").disabled = modPage <= 1;
+  $("#modNext").disabled = modPage >= pages;
+  $("#list").innerHTML = filtered.slice((modPage - 1) * MOD_PAGE_SIZE, modPage * MOD_PAGE_SIZE).map(r => {
+    const date = new Date(r.created_at);
+    const stamp = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("ru-RU");
+    return `<details class="mod-card" data-id="${r.id}">
+      <summary><span class="mod-card-code">${code(r.id)}</span><span class="mod-card-title">${esc(r.type)}<small>${esc(stamp)}</small></span><span class="mod-badge status-${ST.indexOf(r.status)}">${esc(r.status)}</span><span class="mod-expand" aria-hidden="true">⌄</span></summary>
+      <div class="mod-card-body">
+       <p class="mod-description">${esc(r.description || "Описание не добавлено.")}</p>
+       <div class="mod-photos"></div>
+       <div class="mod-edit"><label>Новый статус<select class="mod-status">${ST.map(status => `<option${status === r.status ? " selected" : ""}>${status}</option>`).join("")}</select></label>
+       <label>Фото «после»${r.photo_after ? ' <small>Уже добавлено · можно заменить</small>' : ""}<input type="file" accept="image/*" class="after"></label>
+       <button type="button" class="mod-save">Сохранить изменения</button></div>
+       ${r.cleanup_enabled ? `<div class="mod-cleanup">Запись на уборку открыта <button type="button" class="cleanup-close">Закрыть запись</button></div>` : ""}
+       <p class="mod-card-message" role="status" aria-live="polite"></p>
+      </div></details>`;
+  }).join("") || '<div class="mod-empty"><h3>Здесь чисто</h3><p>Заявок с такими условиями нет. Измените фильтр или поиск.</p></div>';
+  document.querySelectorAll(".mod-card").forEach(card => {
+    const report = reports.find(r => String(r.id) === card.dataset.id);
+    for (const [url, caption] of [[report.photo, "До"], [report.photo_after, "После"]]) {
+      if (!url) continue;
+      try {
+        const parsed = new URL(url, window.location.href);
+        if (!["https:", "http:"].includes(parsed.protocol)) continue;
+        const link = document.createElement("a");
+        link.href = parsed.href; link.target = "_blank"; link.rel = "noopener noreferrer";
+        const image = document.createElement("img"); image.src = parsed.href; image.alt = caption; image.loading = "lazy";
+        link.append(image, document.createTextNode(caption)); card.querySelector(".mod-photos").append(link);
+      } catch {}
+    }
+  });
+}
 
-  button.disabled = true;
-
-  try {
-    const { error } = await sb
-      .from("reports")
-      .update({ cleanup_enabled: false })
-      .eq("id", button.dataset.report);
-
-    if (error) throw error;
-
-    await load();
-  } catch (error) {
-    alert("Ошибка: " + error.message);
-    button.disabled = false;
-  }
-});
-$("#list").onchange = async e => {
-  if (!isModerator || e.target.tagName !== "SELECT") return;
-  const id = e.target.dataset.id, status = e.target.value;
-  const file = e.target.closest(".item").querySelector(".after")?.files[0];
-  const r = reports.find(x => x.id == id);
-  if (status === "Убрано" && !file && !r.photo_after) { alert("Для статуса «Убрано» сначала выберите фото «после»."); return load(); }
-  try { await store.setStatus(id, status, file); } catch (err) { alert("Ошибка: " + (err.message || err)); }
-  load();
+for (const id of ["modSearch", "modStatus", "modSort"]) {
+  $("#" + id).addEventListener(id === "modSearch" ? "input" : "change", () => { modPage = 1; renderList(); });
+}
+$("#modPrev").onclick = () => { modPage--; renderList(); };
+$("#modNext").onclick = () => { modPage++; renderList(); };
+$("#modRefresh").onclick = async () => {
+  if (modBusy) return;
+  $("#modRefresh").disabled = true;
+  try { await load(); $("#modMessage").textContent = "Заявки обновлены."; }
+  catch { $("#modMessage").textContent = "Не удалось обновить заявки. Попробуйте ещё раз."; }
+  finally { $("#modRefresh").disabled = false; }
 };
+$("#list").addEventListener("click", async e => {
+  const button = e.target.closest(".mod-save, .cleanup-close");
+  if (!button || !isModerator || !sb || modBusy) return;
+  const card = button.closest(".mod-card");
+  const report = reports.find(r => String(r.id) === card.dataset.id);
+  const message = card.querySelector(".mod-card-message");
+  const status = card.querySelector(".mod-status").value;
+  const file = card.querySelector(".after").files[0];
+  const closing = button.classList.contains("cleanup-close");
+  if (!closing && status === "Убрано" && !file && !report.photo_after) {
+    message.textContent = "Добавьте фото «после», чтобы подтвердить уборку."; return;
+  }
+  if (!closing && file && (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024)) {
+    message.textContent = "Выберите изображение размером до 10 МБ."; return;
+  }
+  modBusy = true; button.disabled = true; message.textContent = "Сохранение...";
+  try {
+    if (closing) {
+      const {data, error} = await sb.from("reports").update({cleanup_enabled:false}).eq("id", report.id).select("id");
+      if (error) throw error;
+      if (!data?.length) throw new Error("Заявка недоступна или права изменились.");
+    } else { await store.setStatus(report.id, status, file); }
+    $("#modMessage").textContent = `${code(report.id)}: ${closing ? "запись закрыта" : "изменения сохранены"}.`;
+    await load();
+  } catch (error) { message.textContent = "Не удалось сохранить: " + error.message; }
+  finally { modBusy = false; button.disabled = false; }
+});
 if (sb) sb.auth.onAuthStateChange(() => {
   // Не вызываем методы Supabase синхронно из auth callback.
   setTimeout(() => syncModerator().catch(console.error), 0);
@@ -457,7 +488,11 @@ if (sb) sb.auth.onAuthStateChange(() => {
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x == b));
   $("#v-map").hidden = b.dataset.v !== "map"; $("#v-mod").hidden = b.dataset.v !== "mod";
+  document.body.classList.toggle("moderator-view", b.dataset.v === "mod");
+  history.replaceState(null, "", b.dataset.v === "mod" ? "#moderator" : "#map");
+  if (b.dataset.v === "map") requestAnimationFrame(() => map.invalidateSize());
 });
+if (window.location.hash === "#moderator") document.querySelector('nav button[data-v="mod"]').click();
 $("#legend").innerHTML = ST.map((s, i) => `<span><i class="pin" style="background:${COL[i]}"></i>${s}</span>`).join("");
 
 async function startApp() {
