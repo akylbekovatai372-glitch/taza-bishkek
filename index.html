@@ -3,7 +3,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Taza Bishkek — карта проблемных точек</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="style.css"></head>
+<link rel="stylesheet" href="style.css?v=5">
+</head>
 <body>
 <header>
   <div class="brand">
@@ -30,6 +31,16 @@
 <div id="map"></div>
 <aside>
  <section id="v-map">
+  <details class="map-filters" open>
+   <summary>Фильтры карты</summary>
+   <form id="mapFilters">
+    <label>Статус<select name="status"><option value="active">Все незавершённые</option><option value="all">Все статусы</option><option>Новая</option><option>Проверена</option><option>В работе</option><option>Убрано</option></select></label>
+    <label>Категория<select name="type"><option value="">Все категории</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select></label>
+    <label>Начиная с даты<input name="since" type="date"></label>
+    <button type="reset">Сбросить фильтры</button>
+   </form>
+   <p id="filterCount" role="status" aria-live="polite"></p>
+  </details>
   <h2>Сообщить о точке</h2>
   <div id="legend"></div>
   <p class="hint">Нажмите на карте место или <button id="geo" type="button">моё местоположение</button></p>
@@ -38,9 +49,9 @@
    <textarea name="desc" placeholder="Описание (без имён и телефонов)"></textarea>
    <input type="file" name="photo" accept="image/*">
    <div id="dup" class="warn" hidden></div>
-   <button>Отправить заявку</button>
+   <button type="submit">Отправить заявку</button>
   </form>
-  <p id="msg"></p>
+  <p id="msg" role="status" aria-live="polite"></p>
  </section>
  <section id="v-mod" hidden>
   <p id="modHelp" class="hint"></p><div id="login"><input id="email" type="email" autocomplete="username" placeholder="Email модератора"><input id="pw" type="password" autocomplete="current-password" placeholder="Пароль"><button id="loginBtn">Войти</button></div><button id="logoutBtn" hidden>Выйти</button>

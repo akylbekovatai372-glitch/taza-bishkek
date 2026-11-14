@@ -23,7 +23,7 @@ async function loadStatistics() {
     const countReports = async (status) => {
       let query = sb
         .from("reports")
-        .select("*", { count: "exact", head: true });
+      .select("id", { count: "exact", head: true });
 
       if (status) {
         query = query.eq("status", status);

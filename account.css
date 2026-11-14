@@ -164,3 +164,65 @@ main {
 [hidden] {
   display: none !important;
 }
+.cleanup-leave-btn {
+  display: block;
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fff5f5;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cleanup-leave-btn:hover {
+  background: #fee2e2;
+}
+
+.cleanup-leave-btn:disabled {
+  opacity: 0.5;
+}
+/* ---- Вкладки личного кабинета ---- */
+
+.dashboard-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  margin: 25px 0;
+  background: #edf5ef;
+  border-radius: 14px;
+}
+
+.dashboard-tab {
+  flex: 1;
+  padding: 14px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #64776a;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dashboard-tab.active {
+  background: #16834a;
+  color: white;
+}
+
+.dashboard-tab:not(.active):hover {
+  background: #dceee1;
+}
+
+.dashboard-panel {
+  animation: dashboardFade 0.25s ease;
+}
+
+@keyframes dashboardFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
