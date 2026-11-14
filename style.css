@@ -277,3 +277,8 @@ body.moderator-view { background: #f5f7f8; }
  .mod-edit { grid-template-columns: 1fr; }
  .mod-photos img { width: 125px; height: 100px; }
 }
+
+@media(max-width:700px) {
+ input, select, textarea { font-size: 16px; }
+ #form button, .mod-toolbar button, .mod-pagination button, .mod-save, #loginBtn { min-height: 44px; }
+}

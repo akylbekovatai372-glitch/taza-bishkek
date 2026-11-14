@@ -226,3 +226,4 @@ main {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+@media(max-width:600px) { input, select, textarea { font-size: 16px; } button { min-height: 44px; } .header-inner { flex-wrap: wrap; gap: 12px; } }

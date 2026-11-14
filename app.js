@@ -1,4 +1,5 @@
 const C = window.CONFIG;
+if (window.matchMedia("(max-width: 700px)").matches) document.querySelector(".map-filters").open = false;
 const ST = ["Новая", "Проверена", "В работе", "Убрано"];
 const COL = ["#e03131", "#f08c00", "#1c7ed6", "#2f9e44"];
 const $ = s => document.querySelector(s);

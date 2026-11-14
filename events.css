@@ -179,4 +179,28 @@ footer {
     font-size: 12px;
     padding: 10px;
   }
-}
+}[hidden] { display: none !important; }
+.events-toolbar { display: flex; align-items: end; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+.events-toolbar label, #eventForm label { display: grid; gap: 7px; font-size: 14px; }
+button, input, select, textarea { font: inherit; }
+.events-toolbar button, #eventAdmin button, .event-edit { padding: 11px 16px; border: 1px solid #cce0d2; border-radius: 9px; color: #166534; background: white; cursor: pointer; }
+input, select, textarea { min-width: 0; padding: 11px; border: 1px solid #cce0d2; border-radius: 8px; background: white; }
+textarea { min-height: 90px; resize: vertical; }
+#eventAdmin { background: white; border: 1px solid #cce0d2; border-radius: 16px; padding: 20px; }
+#eventEditor summary { cursor: pointer; font-size: 18px; font-weight: bold; }
+#eventNew { margin: 18px 0; }
+#eventForm { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+#eventForm input:not([type=checkbox]), #eventForm textarea, #eventForm select { width: 100%; }
+#eventForm .event-check { display: flex; align-items: center; }
+.event-button:not(:disabled) { background: #16834a; color: white; cursor: pointer; }
+button:disabled { opacity: .65; cursor: not-allowed; }
+.event-edit { margin-top: 10px; width: 100%; }
+.event-content { overflow-wrap: anywhere; }
+.event-description, .event-info { white-space: pre-wrap; }
+.events-empty { padding: 30px; border: 1px dashed #b4c9bc; border-radius: 12px; }
+.event-feedback { font-size: 13px; color: #9b302c; }
+.events-toolbar select { display: block; margin-top: 6px; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid #80c9a3; outline-offset: 3px; }
+@media(max-width:600px) { #eventForm { grid-template-columns: 1fr; } .header-inner { flex-wrap: wrap; } .section-heading { gap: 12px; flex-wrap: wrap; } }
+
+@media(max-width:600px) { input, select, textarea { font-size: 16px; } button, .back { min-height: 44px; } }
