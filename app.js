@@ -7,6 +7,8 @@ const code = id => "TB-" + String(id).padStart(3, "0");
 const esc = s => String(s).replace(/[&<>"']/g, c => "&#" + c.charCodeAt(0) + ";");
 const sb = C.SUPABASE_URL && C.SUPABASE_KEY ? supabase.createClient(C.SUPABASE_URL, C.SUPABASE_KEY) : null;
 let isModerator = false;
+const linkedReportId = Number(new URLSearchParams(location.search).get("report"));
+let linkedReportOpened = false;
 let modPage = 1;
 const MOD_PAGE_SIZE = 12;
 let modBusy = false;
@@ -77,7 +79,7 @@ async function renderVolunteerBox(container, report) {
 
     container.innerHTML = `
       <div class="volunteer-count">
-        👥 Участников: ${count}
+         Участников: ${count}
       </div>
 
       <button class="volunteer-btn ${joined ? "joined" : ""}">
@@ -257,6 +259,7 @@ function checkDup() {
 
 async function load() {
   reports = await store.list();
+  if(!linkedReportOpened && reports.some(r=>r.id===linkedReportId && r.status==='Убрано')) $('#mapFilters').elements.namedItem('status').value='all';
 
   renderMap();
   renderList();
@@ -319,6 +322,11 @@ function renderMap() {
 
         renderVolunteerBox(container, r);
       });
+      if(!linkedReportOpened && r.id === linkedReportId) {
+        linkedReportOpened = true;
+        map.setView([r.lat,r.lng],16);
+        marker.openPopup();
+      }
 
     });
 

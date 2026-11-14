@@ -1,220 +1,29 @@
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-  <title>Taza Bishkek — Чистый город</title>
-  <link rel="stylesheet" href="home.css">
-<link rel="stylesheet" href="i18n.css?v=1">
-<script src="i18n.js?v=1"></script>
-</head>
-
-<body>
-
-  <!-- ШАПКА -->
-  <header class="header">
-    <a href="home.html" class="logo">
-      🌿 Taza Bishkek
-    </a>
-
-    
-<button
-  class="menu-toggle"
-  type="button"
-  aria-label="Открыть меню"
-  aria-controls="mobile-navigation"
-  aria-expanded="false"
->
-  ☰
-</button>
-<nav class="nav" id="mobile-navigation">
-  <a href="home.html">Главная</a>
-  <a href="index.html">Отправить заявку</a>
-  <a href="events.html">Мероприятия</a>
-  <a href="#help">Помощь</a>
-  <a href="#status">Проверить статус</a>
-  <a href="#statistics">Статистика</a>
-  <a href="account.html">Мой аккаунт</a>
-</nav>
-    <div class="header-actions">
-      <label class="language-switch" data-no-i18n><span class="language-caption">RU / KY</span><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label>
-    </div>
-  </header>
-
-  <main>
-
-    <!-- ПРИВЕТСТВИЕ -->
-    <section class="hero">
-      <div class="hero-content">
-        <p class="eyebrow">Экологическая платформа</p>
-
-        <h1>Сделаем Бишкек чище вместе!</h1>
-
-        <p class="hero-text">
-          Увидел мусор на улице?
-          Отметь проблемное место на карте,
-          отправь фотографию и следи
-          за статусом своей заявки.
-        </p>
-
-        <div class="hero-buttons">
-          <a href="index.html" class="btn-primary">
-            📍 Отправить заявку
-          </a>
-
-          <a href="#help" class="btn-secondary">
-            Как это работает?
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ИНСТРУКЦИЯ -->
-    <section id="help" class="section">
-      <h2>Как это работает?</h2>
-
-      <div class="cards">
-        <article class="card">
-          <div class="card-icon">📸</div>
-          <h3>1. Сфотографируй</h3>
-          <p>Найди экологическую проблему.</p>
-        </article>
-
-        <article class="card">
-          <div class="card-icon">📍</div>
-          <h3>2. Отметь на карте</h3>
-          <p>Укажи место и отправь заявку.</p>
-        </article>
-
-        <article class="card">
-          <div class="card-icon">✅</div>
-          <h3>3. Следи за статусом</h3>
-          <p>Проверяй изменения по номеру заявки.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- СТАТИСТИКА -->
-    
-<!-- СТАТИСТИКА -->
-<section id="statistics" class="section">
-  <h2>Наши результаты</h2>
-
-  <p class="stats-description">
-    Вместе мы делаем Бишкек чище!
-    Следи за результатами нашего проекта.
-  </p>
-
-  <div class="stats-grid">
-
-    <div class="stat-card">
-      <div class="stat-icon">📋</div>
-      <h3 id="totalReports">—</h3>
-      <p>Всего заявок</p>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">⏳</div>
-      <h3 id="activeReports">—</h3>
-      <p>В работе</p>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">✅</div>
-      <h3 id="cleanedReports">—</h3>
-      <p>Убрано</p>
-    </div>
-
-  </div>
-
-  <p id="statsMessage">
-    Загрузка статистики...
-  </p>
-</section>
-
-
-    <!-- ПРОВЕРКА СТАТУСА -->
-   
-<section id="status" class="section">
-  <h2>Проверить статус заявки</h2>
-
-  <p>
-    Введите номер заявки, чтобы узнать,
-    на каком этапе находится обращение.
-  </p>
-
-  <form id="statusForm" class="status-form">
-    <label for="reportCode">Номер заявки</label>
-
-    <div class="status-search">
-      <input
-        id="reportCode"
-        type="text"
-        placeholder="Например, TB-012"
-        maxlength="20"
-        required
-      >
-
-      <button type="submit">
-        Найти заявку
-      </button>
-    </div>
-  </form>
-
-  <div id="statusResult"
-       role="status"
-       aria-live="polite"></div>
-</section>
-
-    <!-- АККАУНТ -->
-    <section id="account" class="section">
-      <h2>Мой аккаунт</h2>
-      <p>
-        Просматривай свои заявки, следи за их статусами
-        и управляй участием в уборках.
-      </p>
-      <a href="account.html" class="btn-primary">Открыть личный кабинет</a>
-    </section>
-
-  </main>
-
-  <!-- ПОДВАЛ -->
-  <footer class="footer">
-    <p>© Taza Bishkek. Вместе за чистый город!</p>
-    <p>WhatsApp и Telegram — скоро</p>
-  </footer>
-
-
-<script>
-  const menuButton = document.querySelector(".menu-toggle");
-  const navigation = document.querySelector(".nav");
-
-  menuButton.addEventListener("click", () => {
-    const isOpen = navigation.classList.toggle("open");
-
-    menuButton.setAttribute("aria-expanded", String(isOpen));
-    menuButton.setAttribute(
-      "aria-label",
-      isOpen ? "Закрыть меню" : "Открыть меню"
-    );
-
-    menuButton.textContent = isOpen ? "✕" : "☰";
-  });
-
-  navigation.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-      navigation.classList.remove("open");
-      menuButton.setAttribute("aria-expanded", "false");
-      menuButton.setAttribute("aria-label", "Открыть меню");
-      menuButton.textContent = "☰";
-    });
-  });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
-<script src="home.js?v=lang1"></script>
-</body>
-</html>
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Taza Bishkek — Чистый город</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="i18n.css?v=1"><link rel="stylesheet" href="design.css?v=2"><link rel="stylesheet" href="home.css?v=2">
+<script src="i18n.js?v=design2"></script><script src="ui.js?v=2"></script></head>
+<body class="home-page">
+<header class="site-header header">
+ <a class="logo" href="home.html"><span class="brand-mark" data-icon="leaf"></span><span>Taza Bishkek</span></a>
+ <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="mobile-navigation" aria-expanded="false"><span data-icon="menu"></span></button>
+ <nav class="nav" id="mobile-navigation"><a href="index.html">Карта города</a><a href="events.html">Мероприятия</a><a href="#help">Как это работает?</a><a href="#status">Проверить статус</a></nav>
+ <div class="header-actions"><label class="language-switch" data-no-i18n><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label><a class="profile-link" href="account.html" aria-label="Мой аккаунт"><span data-icon="user"></span></a></div>
+</header>
+<main>
+ <section class="hero shell">
+  <div class="hero-content"><p class="eyebrow"><span class="live-dot"></span>Бишкек · городское сообщество</p><h1>Чистый Бишкек <br><em>начинается с нас.</em></h1><p class="hero-text">Замечай проблемы. Объединяйся с соседями. Меняй город, в котором живёшь.</p><div class="hero-buttons"><a href="index.html" class="btn-primary"><span data-icon="plus"></span><span>Сообщить о проблеме</span></a><a href="events.html" class="btn-secondary">Помочь городу<span data-icon="arrow"></span></a></div><div class="hero-footnote"><span data-icon="check"></span><span>Открытая карта. Реальные заявки. Общий результат.</span></div></div>
+  <div class="hero-map-wrap"><div class="map-topline"><span><span class="live-dot"></span><span>Карта города</span></span><span class="map-coordinate" data-no-i18n>42.87° N / 74.57° E</span></div><div id="cityPreview" aria-label="Карта Бишкека"></div><a class="map-open" href="index.html"><span data-icon="map"></span><span>Посмотреть карту</span><span data-icon="arrow"></span></a></div>
+ </section>
+ <section id="statistics" class="stats-section shell"><div class="stats-heading"><p class="eyebrow">ГОРОД В ЦИФРАХ</p><h2>Каждая заявка — <br>шаг к переменам.</h2></div><div class="stats-grid"><div class="stat-card"><h3 id="totalReports">—</h3><p>Всего заявок</p></div><div class="stat-card"><h3 id="activeReports">—</h3><p>Ожидают решения</p></div><div class="stat-card"><h3 id="cleanedReports">—</h3><p>Убрано</p></div></div><p id="statsMessage" role="status">Загрузка статистики...</p></section>
+ <section class="section shell"><div class="section-head"><div><p class="eyebrow">НА КАРТЕ ПРЯМО СЕЙЧАС</p><h2>Городу нужно внимание.</h2></div><a class="text-link" href="index.html">Все заявки<span data-icon="arrow"></span></a></div><div id="recentReports" class="report-preview-grid" aria-live="polite"><p class="empty-note">Загрузка заявок</p></div></section>
+ <section id="help" class="how-section"><div class="shell"><div class="section-head"><div><p class="eyebrow">ПРОСТО НАЧАТЬ</p><h2>От проблемы — к решению.</h2></div><p class="section-note">Несколько минут твоего времени могут изменить целую улицу.</p></div><div class="steps"><article><span class="step-index">01</span><span class="step-icon" data-icon="camera"></span><h3>Покажи проблему</h3><p>Сфотографируй мусор и отметь место на карте.</p></article><article><span class="step-index">02</span><span class="step-icon" data-icon="shield"></span><h3>Дождись проверки</h3><p>Модератор проверит заявку. Следи за изменениями по её номеру.</p></article><article><span class="step-index">03</span><span class="step-icon" data-icon="leaf"></span><h3>Стань частью решения</h3><p>Присоединяйся к организованным уборкам и помогай менять город.</p></article></div></div></section>
+ <section class="section shell"><div class="section-head"><div><p class="eyebrow">ВМЕСТЕ ЛЕГЧЕ</p><h2>Встречаемся, чтобы помочь.</h2></div><a class="text-link" href="events.html">Все мероприятия<span data-icon="arrow"></span></a></div><div id="homeEvents" class="home-events" aria-live="polite"><p class="empty-note">Загрузка мероприятий...</p></div></section>
+ <section id="status" class="status-section shell"><div><p class="eyebrow">ДЕРЖИМ В КУРСЕ</p><h2>Что с твоей заявкой?</h2><p>Введи её номер — покажем текущий статус.</p></div><div class="status-box"><form id="statusForm" class="status-form"><label for="reportCode">Номер заявки</label><div class="status-search"><input id="reportCode" placeholder="Например, TB-012" maxlength="20" required><button type="submit" aria-label="Найти заявку"><span data-icon="search"></span></button></div></form><div id="statusResult" role="status" aria-live="polite"></div></div></section>
+ <section id="account" class="join-section shell"><span data-icon="leaf"></span><div><h2>Твой город. Твой вклад.</h2><p>Все заявки, уборки и мероприятия — в личном кабинете.</p></div><a class="btn-primary" href="account.html">Мой аккаунт<span data-icon="arrow"></span></a></section>
+</main>
+<footer class="site-footer shell"><a class="logo" href="home.html"><span class="brand-mark" data-icon="leaf"></span><span>Taza Bishkek</span></a><p>Городские проблемы. Общие решения.</p><a href="#help">Помощь</a><span data-no-i18n>© 2026</span></footer>
+<nav class="bottom-nav" aria-label="Основная навигация"><a href="home.html" aria-current="page"><span data-icon="home"></span><span>Главная</span></a><a href="index.html"><span data-icon="map"></span><span>Карта</span></a><a href="events.html"><span data-icon="calendar"></span><span>Мероприятия</span></a><a href="account.html"><span data-icon="user"></span><span>Профиль</span></a></nav>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="home.js?v=design2"></script>
+</body></html>
