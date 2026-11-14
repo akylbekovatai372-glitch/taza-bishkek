@@ -5,12 +5,14 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="style.css?v=7">
 <link rel="stylesheet" href="i18n.css?v=1">
-<script src="i18n.js?v=1"></script>
+<script src="i18n.js?v=design2"></script>
+<link rel="stylesheet" href="design.css?v=2">
+<script src="ui.js?v=2"></script>
 </head>
-<body>
+<body class="map-page">
 <header>
   <div class="brand">
-    <span class="brand-icon">🌿</span>
+    <span class="brand-icon"><span class="brand-mark" data-icon="leaf"></span></span>
     <div>
       <h1>Taza Bishkek</h1>
       <p class="brand-subtitle">Чистый город начинается с тебя</p>
@@ -22,10 +24,10 @@
 <a href="home.html" class="back-home">← На главную</a>
 
   <button type="button" data-v="map" class="on">
-    🗺️ Карта проблем
+     <span data-icon="map"></span><span>Карта проблем</span>
   </button>
   <button type="button" data-v="mod">
-    🛡️ Панель модератора
+     <span data-icon="shield"></span><span>Панель модератора</span>
   </button>
 </nav>
 <label class="language-switch" data-no-i18n><span class="language-caption">RU / KY</span><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label>
@@ -34,7 +36,7 @@
 <div id="map"></div>
 <aside>
  <section id="v-map">
-  <details class="map-filters" open>
+  <details class="map-filters">
    <summary>Фильтры карты</summary>
    <form id="mapFilters">
     <label>Статус<select name="status"><option value="active">Все незавершённые</option><option value="all">Все статусы</option><option>Новая</option><option>Проверена</option><option>В работе</option><option>Убрано</option></select></label>
@@ -44,13 +46,13 @@
    </form>
    <p id="filterCount" role="status" aria-live="polite"></p>
   </details>
-  <h2>Сообщить о точке</h2>
+  <h2>Сообщить о проблеме</h2><p class="map-intro">Отметьте место на карте и приложите фото. Модератор проверит вашу заявку.</p>
   <div id="legend"></div>
-  <p class="hint">Нажмите на карте место или <button id="geo" type="button">моё местоположение</button></p>
+  <p class="hint">Нажмите на карте место или <button id="geo" type="button"><span data-icon="locate"></span><span>моё местоположение</span></button></p>
   <form id="form">
-   <select name="type" aria-label="Тип проблемы" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select>
-   <textarea name="desc" aria-label="Описание проблемы" placeholder="Описание (без имён и телефонов)"></textarea>
-   <input type="file" name="photo" aria-label="Фото проблемы" accept="image/*">
+   <label>Категория<select name="type" aria-label="Тип проблемы" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select></label>
+   <label>Описание<textarea name="desc" aria-label="Описание проблемы" placeholder="Описание (без имён и телефонов)"></textarea></label>
+   <label>Фото проблемы<input type="file" name="photo" aria-label="Фото проблемы" accept="image/*"></label>
    <div id="dup" class="warn" hidden></div>
    <button type="submit">Отправить заявку</button>
   </form>
@@ -83,6 +85,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
-<script src="app.js?v=lang1"></script>
+<script src="app.js?v=design2"></script>
+<nav class="bottom-nav" aria-label="Основная навигация"><a href="home.html"><span data-icon="home"></span><span>Главная</span></a><a href="index.html" aria-current="page"><span data-icon="map"></span><span>Карта</span></a><a href="events.html"><span data-icon="calendar"></span><span>Мероприятия</span></a><a href="account.html"><span data-icon="user"></span><span>Профиль</span></a></nav>
 </body></html>
    
