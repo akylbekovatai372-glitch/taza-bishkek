@@ -5,13 +5,14 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="style.css?v=7">
 <link rel="stylesheet" href="i18n.css?v=1">
-<script src="i18n.js?v=app1"></script>
+<script src="i18n.js?v=clear1"></script>
 <link rel="stylesheet" href="design.css?v=3">
 <script src="ui.js?v=app1"></script>
-<script src="report-wizard.js?v=1"></script>
+<script src="report-wizard.js?v=clear1"></script>
 <link rel="stylesheet" href="bold.css?v=calm1">
-<link rel="stylesheet" href="settings.css?v=1"><script src="settings.js?v=app1"></script>
+<link rel="stylesheet" href="settings.css?v=1"><script src="settings.js?v=clear1"></script>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#326454"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Taza Bishkek"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="icons/app-192.png"><link rel="stylesheet" href="pwa.css?v=1"><script src="pwa.js?v=1"></script>
+<link rel="stylesheet" href="clarity.css?v=1">
 </head>
 <body class="map-page">
 <header>
@@ -36,10 +37,27 @@
 </nav>
 <label class="language-switch" data-no-i18n><span class="language-caption">RU / KY</span><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label>
 </header>
+<section class="mobile-map-intro" aria-label="Как отправить заявку"><p class="map-step-title" id="mapStepHint" role="status">Шаг 1 из 3: выбери место</p><p id="mapStageHelp">Нажми на место с мусором на карте. Затем нажми «Далее».</p><button id="startReport" class="start-report" type="button" hidden><span data-icon="plus"></span><span>Новая заявка</span></button><details class="map-touch-help"><summary>Как пользоваться картой?</summary><p>Передвигай карту пальцем, увеличивай двумя пальцами. Цветные точки — существующие заявки: нажми на точку, чтобы прочитать её.</p><p>Для новой заявки нажми на свободное место карты. Отметку можно передвинуть.</p></details></section>
 <main>
-<div id="map"></div>
+<div class="map-canvas-panel"><div id="map" aria-label="Карта: выбери место с мусором"></div><button class="map-next" id="mapNext" type="button" hidden><span data-icon="check"></span><span>Место выбрано. Далее</span><span data-icon="arrow"></span></button></div>
 <aside>
  <section id="v-map">
+
+  <p class="form-kicker">НОВАЯ ЗАЯВКА</p><h2>Сообщить о мусоре</h2>
+  <ol class="wizard-progress" tabindex="-1" aria-label="Этапы заявки"><li>Место</li><li>Детали</li><li>Проверка</li></ol>
+  <form id="form" novalidate>
+   <section data-wizard-step="1"><p class="map-intro">Нажми на карту или используй своё местоположение. Если место выбрано верно, переходи к описанию.</p><button id="geo" type="button"><span data-icon="locate"></span><span>Использовать моё местоположение</span></button><p id="wizardLocation" class="wizard-location" role="status"></p><div id="dup" class="warn" hidden></div><div id="legend"></div></section>
+   <section data-wizard-step="2" hidden>
+    <label>Категория<select name="type" aria-label="Тип проблемы" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select></label>
+    <label>Описание (необязательно)<textarea name="desc" aria-label="Описание проблемы" placeholder="Например: мусор возле контейнера во дворе. Без имён и телефонов." maxlength="2000"></textarea></label>
+    <label class="photo-drop">Фото проблемы<input id="photoInput" type="file" name="photo" aria-label="Фото проблемы" accept="image/jpeg,image/png,image/webp"><span class="photo-hint">JPG, PNG или WebP · до 15 МБ</span></label>
+    <img id="photoPreview" class="photo-preview" alt="Предпросмотр фото" hidden>
+    <p id="photoFeedback" class="photo-feedback" role="status" aria-live="polite"></p><button id="photoRemove" class="text-button" type="button" hidden>Убрать фото</button><p class="map-intro">Фото необязательно, но помогает проверить проблему.</p>
+   </section>
+   <section data-wizard-step="3" hidden><h3>Всё верно?</h3><p class="map-intro">Проверьте детали. После отправки заявка поступит модератору.</p><dl class="review-list"><dt>Категория</dt><dd id="reviewType" data-user-content></dd><dt>Место</dt><dd id="reviewLocation" data-user-content></dd><dt>Описание</dt><dd id="reviewDescription" data-user-content></dd></dl><img id="reviewPhoto" class="photo-preview" alt="Предпросмотр фото" hidden></section>
+   <p id="wizardMessage" role="status" aria-live="polite"></p><div class="wizard-actions"><button id="wizardBack" type="button" hidden>Назад</button><button id="wizardNext" type="button">Далее: описание и фото</button><button id="wizardSend" type="submit" hidden>Отправить заявку</button></div>
+  </form>
+  <p id="msg" role="status" aria-live="polite"></p>
   <details class="map-filters">
    <summary>Фильтры карты</summary>
    <form id="mapFilters">
@@ -50,21 +68,6 @@
    </form>
    <p id="filterCount" role="status" aria-live="polite"></p>
   </details>
-  <p class="form-kicker">ТВОЙ ПЕРВЫЙ ШАГ</p><h2>Изменим это место.</h2>
-  <ol class="wizard-progress"><li>Место</li><li>Детали</li><li>Проверка</li></ol>
-  <form id="form" novalidate>
-   <section data-wizard-step="1"><p class="map-intro">Отметьте проблему на карте. Можно выбрать точку вручную или использовать своё местоположение.</p><button id="geo" type="button"><span data-icon="locate"></span><span>моё местоположение</span></button><p id="wizardLocation" class="wizard-location" role="status"></p><div id="dup" class="warn" hidden></div><div id="legend"></div></section>
-   <section data-wizard-step="2" hidden>
-    <label>Категория<select name="type" aria-label="Тип проблемы" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select></label>
-    <label>Описание<textarea name="desc" aria-label="Описание проблемы" placeholder="Описание (без имён и телефонов)" maxlength="2000"></textarea></label>
-    <label class="photo-drop">Фото проблемы<input id="photoInput" type="file" name="photo" aria-label="Фото проблемы" accept="image/jpeg,image/png,image/webp"><span class="photo-hint">JPG, PNG или WebP · до 15 МБ</span></label>
-    <img id="photoPreview" class="photo-preview" alt="Предпросмотр фото" hidden>
-    <p id="photoFeedback" class="photo-feedback" role="status" aria-live="polite"></p><button id="photoRemove" class="text-button" type="button" hidden>Убрать фото</button><p class="map-intro">Фото необязательно, но помогает проверить проблему.</p>
-   </section>
-   <section data-wizard-step="3" hidden><h3>Всё верно?</h3><p class="map-intro">Проверьте детали. После отправки заявка поступит модератору.</p><dl class="review-list"><dt>Категория</dt><dd id="reviewType" data-user-content></dd><dt>Место</dt><dd id="reviewLocation" data-user-content></dd><dt>Описание</dt><dd id="reviewDescription" data-user-content></dd></dl><img id="reviewPhoto" class="photo-preview" alt="Предпросмотр фото" hidden></section>
-   <p id="wizardMessage" role="status" aria-live="polite"></p><div class="wizard-actions"><button id="wizardBack" type="button" hidden>Назад</button><button id="wizardNext" type="button">Продолжить</button><button id="wizardSend" type="submit" hidden>Отправить заявку</button></div>
-  </form>
-  <p id="msg" role="status" aria-live="polite"></p>
  </section>
  <section id="v-mod" hidden>
   <div class="mod-heading"><div><p class="mod-eyebrow">РАБОЧЕЕ ПРОСТРАНСТВО</p><h2>Модерация заявок</h2><p id="modHelp" class="hint"></p></div><button id="logoutBtn" type="button" hidden>Выйти</button></div>
@@ -93,7 +96,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
-<script src="app.js?v=bold1"></script>
+<script src="app.js?v=clear1"></script>
 <nav class="bottom-nav" aria-label="Основная навигация"><a href="home.html"><span data-icon="home"></span><span>Главная</span></a><a href="index.html" aria-current="page"><span data-icon="map"></span><span>Карта</span></a><a href="events.html"><span data-icon="calendar"></span><span>Мероприятия</span></a><a href="account.html"><span data-icon="user"></span><span>Профиль</span></a></nav>
 </body></html>
    

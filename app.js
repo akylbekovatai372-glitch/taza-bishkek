@@ -345,15 +345,18 @@ $("#form").onsubmit = async e => {
   const submitButton = f.querySelector('[type="submit"]');
   if (submitButton?.disabled) return;
   if (submitButton) submitButton.disabled = true;
+  $("#msg").classList.remove("report-success");
   $("#msg").textContent = "Отправка заявки...";
   try {
     const fields = new FormData(f);
     const r = await store.add({ type: fields.get("type"), description: fields.get("desc"), lat: pick.lat, lng: pick.lng, ...(sb ? {} : { status: "Новая" }) }, ReportWizard.getFile());
     $("#msg").textContent = "Заявка принята. Ваш номер: " + code(r.id);
+    $("#msg").classList.add("report-success");
     f.reset();
     if(pickMarker)map.removeLayer(pickMarker);
     pick=null;pickMarker=null;ReportWizard.onPoint();
     await load().catch(console.error);
+    if (window.matchMedia("(max-width:700px)").matches) $("#msg").scrollIntoView({block:"center",behavior:"instant"});
   } catch (err) { $("#msg").textContent = err.message === "report_rate_limit" ? "Не больше 5 заявок за 10 минут. Попробуйте позже." : "Ошибка: " + (err.message || err); }
   finally { if (submitButton) submitButton.disabled = false; }
 };
@@ -505,7 +508,12 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   history.replaceState(null, "", b.dataset.v === "mod" ? "#moderator" : "#map");
   if (b.dataset.v === "map") requestAnimationFrame(() => map.invalidateSize());
 });
-if (window.location.hash === "#moderator") document.querySelector('nav button[data-v="mod"]').click();
+function openHashView(){
+  if (window.location.hash === "#moderator") document.querySelector('nav button[data-v="mod"]').click();
+  else if (window.location.hash === "#map") document.querySelector('nav button[data-v="map"]').click();
+}
+window.addEventListener('hashchange', openHashView);
+openHashView();
 $("#legend").innerHTML = ST.map((s, i) => `<span><i class="pin" style="background:${COL[i]}"></i>${s}</span>`).join("");
 
 async function startApp() {

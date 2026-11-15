@@ -1,11 +1,27 @@
 (() => {
   let step=1, prepared=null, previewURL=null, photoSizes=null, processing=false, errorKey='', revision=0, pointGetter=()=>null;
+  let reportIntent=new URLSearchParams(location.search).get('task')==='report';
   const $=s=>document.querySelector(s);
   function clearPhoto(){revision++;prepared=null;photoSizes=null;processing=false;errorKey='';if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;$('#photoPreview').removeAttribute('src');$('#photoPreview').hidden=true;$('#photoRemove').hidden=true;$('#photoFeedback').textContent='';updateButtons();}
   function updateButtons(){ $('#wizardNext').disabled=processing;$('#wizardSend').disabled=processing; }
-  function renderPoint(){const p=pointGetter();$('#wizardLocation').textContent=p ? `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}` : I18N.t('Точка пока не выбрана');$('#wizardLocation').classList.toggle('has-point',!!p);if(step===3)review();}
+  function renderGuidance(){
+    const hasPoint=!!pointGetter();
+    if(hasPoint)reportIntent=true;
+    $('#startReport').hidden=reportIntent||step!==1;
+    $('#mapNext').hidden=!hasPoint||step!==1;
+    $('#mapStepHint').textContent=I18N.t(!reportIntent&&step===1?'Карта заявок':['Шаг 1 из 3: выбери место','Шаг 2 из 3: описание и фото','Шаг 3 из 3: проверь и отправь'][step-1]);
+    $('#mapStageHelp').textContent=I18N.t(!reportIntent&&step===1?'Цветные точки — заявки жителей. Нажми на точку для подробностей или создай новую заявку.':step===1?(hasPoint?'Место выбрано. Нажми «Далее» под картой.':'Нажми на место с мусором на карте. Затем нажми «Далее».'):step===2?'Выбери категорию. Описание и фото можно добавить по желанию.':'Проверь место и детали перед отправкой.');
+    $('#wizardNext').textContent=I18N.t(step===1?'Далее: описание и фото':'Далее: проверить заявку');
+  }
+  function scrollToStep(){
+    if(!window.matchMedia('(max-width:700px)').matches)return;
+    const target=step===1?document.querySelector('.mobile-map-intro'):document.querySelector('.wizard-progress');
+    target.scrollIntoView({block:'start',behavior:'instant'});
+    if(step!==1)target.focus({preventScroll:true});
+  }
+  function renderPoint(){const p=pointGetter();$('#wizardLocation').textContent=p ? I18N.t('Место выбрано на карте')+` · ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}` : I18N.t('Точка пока не выбрана');$('#wizardLocation').classList.toggle('has-point',!!p);renderGuidance();if(step===3)review();}
   function review(){const form=$('#form'),p=pointGetter();$('#reviewType').textContent=I18N.category(form.elements.namedItem('type').value);$('#reviewDescription').textContent=form.elements.namedItem('desc').value||I18N.t('Без описания');$('#reviewLocation').textContent=p?`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`:'';$('#reviewPhoto').hidden=!previewURL;if(previewURL)$('#reviewPhoto').src=previewURL;else $('#reviewPhoto').removeAttribute('src');}
-  function show(next){step=next;document.querySelectorAll('[data-wizard-step]').forEach(n=>n.hidden=Number(n.dataset.wizardStep)!==step);document.querySelectorAll('.wizard-progress li').forEach((n,i)=>{n.classList.toggle('is-current',i+1===step);n.classList.toggle('is-done',i+1<step);if(i+1===step)n.setAttribute('aria-current','step');else n.removeAttribute('aria-current');});$('#wizardBack').hidden=step===1;$('#wizardNext').hidden=step===3;$('#wizardSend').hidden=step!==3;$('#wizardMessage').textContent='';if(step===3)review();updateButtons();}
+  function show(next){const changed=step!==next;step=next;document.querySelectorAll('[data-wizard-step]').forEach(n=>n.hidden=Number(n.dataset.wizardStep)!==step);document.querySelectorAll('.wizard-progress li').forEach((n,i)=>{n.classList.toggle('is-current',i+1===step);n.classList.toggle('is-done',i+1<step);if(i+1===step)n.setAttribute('aria-current','step');else n.removeAttribute('aria-current');});$('#wizardBack').hidden=step===1;$('#wizardNext').hidden=step===3;$('#wizardSend').hidden=step!==3;$('#wizardMessage').textContent='';if(step===3)review();renderGuidance();updateButtons();if(changed)scrollToStep();}
   function validateDetails(){for(const name of ['type','desc']){const input=$('#form').elements.namedItem(name);if(!input.checkValidity()){show(2);input.reportValidity();return false;}}if(processing||errorKey){show(2);$('#wizardMessage').textContent=I18N.t(processing?'Сначала дождитесь обработки фото.':errorKey);return false;}return true;}
   function ready(){if(!pointGetter()){show(1);$('#wizardMessage').textContent='Сначала отметьте место на карте.';return false;}if(!validateDetails())return false;if(step!==3){show(3);return false;}return true;}
   async function prepare(file){
@@ -35,7 +51,7 @@
     finally{if(sourceURL)URL.revokeObjectURL(sourceURL);if(image)image.src='';if(ticket===revision){processing=false;updateButtons();}}
   }
   window.ReportWizard={
-    init({getPoint}){pointGetter=getPoint;$('#wizardNext').onclick=()=>{if(step===1){if(!getPoint()){$('#wizardMessage').textContent='Сначала отметьте место на карте.';return;}show(2);}else if(validateDetails())show(3);};$('#wizardBack').onclick=()=>show(Math.max(1,step-1));$('#photoInput').onchange=e=>prepare(e.target.files[0]);$('#photoRemove').onclick=()=>{$('#photoInput').value='';clearPhoto();};$('#form').addEventListener('reset',()=>{clearPhoto();show(1);setTimeout(renderPoint,0);});window.addEventListener('languagechange',()=>{renderPoint();if(step===3)review();if(errorKey)$('#photoFeedback').textContent=I18N.t(errorKey);else if(photoSizes)$('#photoFeedback').textContent=I18N.t('Готово: {before} → {after} КБ',photoSizes);});show(1);renderPoint();},
+    init({getPoint}){pointGetter=getPoint;$('#startReport').onclick=()=>{reportIntent=true;renderGuidance();};$('#mapNext').onclick=()=>$('#wizardNext').click();$('#wizardNext').onclick=()=>{if(step===1){if(!getPoint()){$('#wizardMessage').textContent='Сначала отметьте место на карте.';scrollToStep();return;}show(2);}else if(validateDetails())show(3);};$('#wizardBack').onclick=()=>show(Math.max(1,step-1));$('#photoInput').onchange=e=>prepare(e.target.files[0]);$('#photoRemove').onclick=()=>{$('#photoInput').value='';clearPhoto();};$('#form').addEventListener('reset',()=>{clearPhoto();show(1);setTimeout(renderPoint,0);});window.addEventListener('languagechange',()=>{renderPoint();if(step===3)review();if(errorKey)$('#photoFeedback').textContent=I18N.t(errorKey);else if(photoSizes)$('#photoFeedback').textContent=I18N.t('Готово: {before} → {after} КБ',photoSizes);});show(1);renderPoint();},
     onPoint:renderPoint, ready, getFile:()=>prepared
   };
 })();
