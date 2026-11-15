@@ -239,6 +239,7 @@ function setPick(ll) {
   }
 
   checkDup();
+  window.ReportWizard?.onPoint();
 }
 
 map.on("click", e => setPick(e.latlng));
@@ -339,7 +340,7 @@ $("#mapFilters").addEventListener("reset", () => setTimeout(renderMap, 0));
 // ---- Форма ----
 $("#form").onsubmit = async e => {
   e.preventDefault();
-  if (!pick) return ($("#msg").textContent = "Сначала отметьте место на карте.");
+  if (!ReportWizard.ready()) return;
   const f = e.target;
   const submitButton = f.querySelector('[type="submit"]');
   if (submitButton?.disabled) return;
@@ -347,10 +348,13 @@ $("#form").onsubmit = async e => {
   $("#msg").textContent = "Отправка заявки...";
   try {
     const fields = new FormData(f);
-    const r = await store.add({ type: fields.get("type"), description: fields.get("desc"), lat: pick.lat, lng: pick.lng, ...(sb ? {} : { status: "Новая" }) }, f.elements.namedItem("photo").files[0]);
+    const r = await store.add({ type: fields.get("type"), description: fields.get("desc"), lat: pick.lat, lng: pick.lng, ...(sb ? {} : { status: "Новая" }) }, ReportWizard.getFile());
     $("#msg").textContent = "Заявка принята. Ваш номер: " + code(r.id);
-    f.reset(); await load();
-  } catch (err) { $("#msg").textContent = "Ошибка: " + (err.message || err); }
+    f.reset();
+    if(pickMarker)map.removeLayer(pickMarker);
+    pick=null;pickMarker=null;ReportWizard.onPoint();
+    await load().catch(console.error);
+  } catch (err) { $("#msg").textContent = err.message === "report_rate_limit" ? "Не больше 5 заявок за 10 минут. Попробуйте позже." : "Ошибка: " + (err.message || err); }
   finally { if (submitButton) submitButton.disabled = false; }
 };
 
@@ -523,6 +527,7 @@ async function startApp() {
   }
 }
 
+ReportWizard.init({getPoint:()=>pick});
 startApp();
 
 
