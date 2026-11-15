@@ -5,9 +5,11 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="style.css?v=7">
 <link rel="stylesheet" href="i18n.css?v=1">
-<script src="i18n.js?v=design2"></script>
+<script src="i18n.js?v=bold1"></script>
 <link rel="stylesheet" href="design.css?v=3">
 <script src="ui.js?v=2"></script>
+<script src="report-wizard.js?v=1"></script>
+<link rel="stylesheet" href="bold.css?v=1">
 </head>
 <body class="map-page">
 <header>
@@ -46,15 +48,19 @@
    </form>
    <p id="filterCount" role="status" aria-live="polite"></p>
   </details>
-  <h2>Сообщить о проблеме</h2><p class="map-intro">Отметьте место на карте и приложите фото. Модератор проверит вашу заявку.</p>
-  <div id="legend"></div>
-  <p class="hint">Нажмите на карте место или <button id="geo" type="button"><span data-icon="locate"></span><span>моё местоположение</span></button></p>
-  <form id="form">
-   <label>Категория<select name="type" aria-label="Тип проблемы" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select></label>
-   <label>Описание<textarea name="desc" aria-label="Описание проблемы" placeholder="Описание (без имён и телефонов)"></textarea></label>
-   <label>Фото проблемы<input type="file" name="photo" aria-label="Фото проблемы" accept="image/*"></label>
-   <div id="dup" class="warn" hidden></div>
-   <button type="submit">Отправить заявку</button>
+  <p class="form-kicker">ТВОЙ ПЕРВЫЙ ШАГ</p><h2>Изменим это место.</h2>
+  <ol class="wizard-progress"><li>Место</li><li>Детали</li><li>Проверка</li></ol>
+  <form id="form" novalidate>
+   <section data-wizard-step="1"><p class="map-intro">Отметьте проблему на карте. Можно выбрать точку вручную или использовать своё местоположение.</p><button id="geo" type="button"><span data-icon="locate"></span><span>моё местоположение</span></button><p id="wizardLocation" class="wizard-location" role="status"></p><div id="dup" class="warn" hidden></div><div id="legend"></div></section>
+   <section data-wizard-step="2" hidden>
+    <label>Категория<select name="type" aria-label="Тип проблемы" required><option value="">Тип проблемы</option><option>Стихийная свалка</option><option>Переполненный контейнер</option></select></label>
+    <label>Описание<textarea name="desc" aria-label="Описание проблемы" placeholder="Описание (без имён и телефонов)" maxlength="2000"></textarea></label>
+    <label class="photo-drop">Фото проблемы<input id="photoInput" type="file" name="photo" aria-label="Фото проблемы" accept="image/jpeg,image/png,image/webp"><span class="photo-hint">JPG, PNG или WebP · до 15 МБ</span></label>
+    <img id="photoPreview" class="photo-preview" alt="Предпросмотр фото" hidden>
+    <p id="photoFeedback" class="photo-feedback" role="status" aria-live="polite"></p><button id="photoRemove" class="text-button" type="button" hidden>Убрать фото</button><p class="map-intro">Фото необязательно, но помогает проверить проблему.</p>
+   </section>
+   <section data-wizard-step="3" hidden><h3>Всё верно?</h3><p class="map-intro">Проверьте детали. После отправки заявка поступит модератору.</p><dl class="review-list"><dt>Категория</dt><dd id="reviewType" data-user-content></dd><dt>Место</dt><dd id="reviewLocation" data-user-content></dd><dt>Описание</dt><dd id="reviewDescription" data-user-content></dd></dl><img id="reviewPhoto" class="photo-preview" alt="Предпросмотр фото" hidden></section>
+   <p id="wizardMessage" role="status" aria-live="polite"></p><div class="wizard-actions"><button id="wizardBack" type="button" hidden>Назад</button><button id="wizardNext" type="button">Продолжить</button><button id="wizardSend" type="submit" hidden>Отправить заявку</button></div>
   </form>
   <p id="msg" role="status" aria-live="polite"></p>
  </section>
@@ -85,7 +91,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
-<script src="app.js?v=design2"></script>
+<script src="app.js?v=bold1"></script>
 <nav class="bottom-nav" aria-label="Основная навигация"><a href="home.html"><span data-icon="home"></span><span>Главная</span></a><a href="index.html" aria-current="page"><span data-icon="map"></span><span>Карта</span></a><a href="events.html"><span data-icon="calendar"></span><span>Мероприятия</span></a><a href="account.html"><span data-icon="user"></span><span>Профиль</span></a></nav>
 </body></html>
    

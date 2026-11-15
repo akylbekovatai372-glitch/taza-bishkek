@@ -3,7 +3,8 @@
 <title>Taza Bishkek — Чистый город</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="i18n.css?v=1"><link rel="stylesheet" href="design.css?v=3"><link rel="stylesheet" href="home.css?v=2">
-<script src="i18n.js?v=design2"></script><script src="ui.js?v=2"></script></head>
+<script src="i18n.js?v=bold1"></script><script src="ui.js?v=2"></script><link rel="stylesheet" href="bold.css?v=1">
+</head>
 <body class="home-page">
 <header class="site-header header">
  <a class="logo" href="home.html"><span class="brand-mark" data-icon="leaf"></span><span>Taza Bishkek</span></a>
@@ -12,9 +13,10 @@
  <div class="header-actions"><label class="language-switch" data-no-i18n><select class="language-select" aria-label="Язык / Тил"><option value="ru" lang="ru">Русский</option><option value="ky" lang="ky">Кыргызча</option></select></label><a class="profile-link" href="account.html" aria-label="Мой аккаунт"><span data-icon="user"></span></a></div>
 </header>
 <main>
+ <div class="city-ribbon"><span>НЕ ПРОХОДИ МИМО.</span><span>СДЕЛАЕМ ГОРОД ЛУЧШЕ.</span><span data-no-i18n>BISHKEK / 42.87° N</span></div>
  <section class="hero shell">
-  <div class="hero-content"><p class="eyebrow"><span class="live-dot"></span>Бишкек · городское сообщество</p><h1>Чистый Бишкек <br><em>начинается с нас.</em></h1><p class="hero-text">Замечай проблемы. Объединяйся с соседями. Меняй город, в котором живёшь.</p><div class="hero-buttons"><a href="index.html" class="btn-primary"><span data-icon="plus"></span><span>Сообщить о проблеме</span></a><a href="events.html" class="btn-secondary">Помочь городу<span data-icon="arrow"></span></a></div><div class="hero-footnote"><span data-icon="check"></span><span>Открытая карта. Реальные заявки. Общий результат.</span></div></div>
-  <div class="hero-map-wrap"><div class="map-topline"><span><span class="live-dot"></span><span>Карта города</span></span><span class="map-coordinate" data-no-i18n>42.87° N / 74.57° E</span></div><div id="cityPreview" aria-label="Карта Бишкека"></div><a class="map-open" href="index.html"><span data-icon="map"></span><span>Посмотреть карту</span><span data-icon="arrow"></span></a></div>
+  <div class="hero-content"><p class="eyebrow"><span class="live-dot"></span>Бишкек · городское сообщество</p><h1><span>ТВОЙ</span><span>ГОРОД.</span><em>ТВОЙ ХОД.</em></h1><p class="hero-text">Замечай проблемы. Объединяйся с соседями. Меняй город, в котором живёшь.</p><div class="hero-buttons"><a href="index.html" class="btn-primary"><span data-icon="plus"></span><span>Сообщить о проблеме</span></a><a href="events.html" class="btn-secondary">Помочь городу<span data-icon="arrow"></span></a></div><div class="hero-footnote"><span data-icon="check"></span><span>Открытая карта. Реальные заявки. Общий результат.</span></div></div>
+  <div class="hero-map-wrap"><div class="map-stamp"><span data-icon="arrow"></span><span>МЕНЯЕМ<br>ВМЕСТЕ</span></div><div class="map-topline"><span><span class="live-dot"></span><span>Карта города</span></span><span class="map-coordinate" data-no-i18n>42.87° N / 74.57° E</span></div><div id="cityPreview" aria-label="Карта Бишкека"></div><a class="map-open" href="index.html"><span data-icon="map"></span><span>Посмотреть карту</span><span data-icon="arrow"></span></a></div>
  </section>
  <section id="statistics" class="stats-section shell"><div class="stats-heading"><p class="eyebrow">ГОРОД В ЦИФРАХ</p><h2>Каждая заявка — <br>шаг к переменам.</h2></div><div class="stats-grid"><div class="stat-card"><h3 id="totalReports">—</h3><p>Всего заявок</p></div><div class="stat-card"><h3 id="activeReports">—</h3><p>Ожидают решения</p></div><div class="stat-card"><h3 id="cleanedReports">—</h3><p>Убрано</p></div></div><p id="statsMessage" role="status">Загрузка статистики...</p></section>
  <section class="section shell"><div class="section-head"><div><p class="eyebrow">НА КАРТЕ ПРЯМО СЕЙЧАС</p><h2>Городу нужно внимание.</h2></div><a class="text-link" href="index.html">Все заявки<span data-icon="arrow"></span></a></div><div id="recentReports" class="report-preview-grid" aria-live="polite"><p class="empty-note">Загрузка заявок</p></div></section>
@@ -25,5 +27,5 @@
 </main>
 <footer class="site-footer shell"><a class="logo" href="home.html"><span class="brand-mark" data-icon="leaf"></span><span>Taza Bishkek</span></a><p>Городские проблемы. Общие решения.</p><a href="#help">Помощь</a><span data-no-i18n>© 2026</span></footer>
 <nav class="bottom-nav" aria-label="Основная навигация"><a href="home.html" aria-current="page"><span data-icon="home"></span><span>Главная</span></a><a href="index.html"><span data-icon="map"></span><span>Карта</span></a><a href="events.html"><span data-icon="calendar"></span><span>Мероприятия</span></a><a href="account.html"><span data-icon="user"></span><span>Профиль</span></a></nav>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="home.js?v=design2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config.js"></script><script src="home.js?v=bold1"></script>
 </body></html>
